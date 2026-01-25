@@ -1,0 +1,22 @@
+.home{
+    width: 100%;
+    height: 100vh;
+}
+
+
+.home_container{
+    width: 100%;
+    height: 100vh;
+    /* text-align: center; */
+    align-items: center;
+    justify-content: center;
+    display: flex;
+
+}
+.home_container h1{
+    font-size: 150px;
+    line-height: 5px;
+}
+.home_container h1:nth-child(2){
+    color: rgb(245,245,245);
+}

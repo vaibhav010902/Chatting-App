@@ -1,0 +1,99 @@
+.profile_panel{
+    height: 100vh;
+    width: 330px;
+    /* border: 1px solid black; */
+    position: fixed;
+    top: 0;
+    left: 50px;
+    overflow: hidden;
+    border-right: 3px solid rgb(245,245,245);
+}
+
+.profile_panel_container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding-top: 20px;
+}
+
+.profile_panel_header_container{
+    width: 100%;
+    padding: 0px 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.profile_panel_header_container h1{
+    font-size: 27px;
+}
+
+.profile_panel_img_container{
+    width: 100%;
+    padding: 0px 15px;
+    display: flex;
+    align-items: center;
+}
+.profile_panel_img_container img{
+    width: 100px;
+    height: 100px;
+    border: 1px solid black;
+    border-radius: 50%;
+    margin: auto;
+    /* background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat; */
+    object-fit: cover;
+}
+/* .chatcontact_search_bar_container input:focus{
+    outline: 1px solid black;
+}
+.chatcontact_search_bar_container input::placeholder{
+    color: gray;
+    font-size: 14px;
+} */
+
+.profile_panel_fields_container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    gap: 20px;
+}
+
+.field_container{
+    width: 100%;
+    /* border: 1px solid black; */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 0px 10px;
+}
+.field_container label{
+    font-size: 16px;
+}
+.field_container p{
+    font-size: 14px;
+    color: gray;
+}
+.field_container input{
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: rgb(245,245,245);
+}
+.field_container input:focus{
+    outline: 1px solid black;
+}

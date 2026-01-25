@@ -1,0 +1,60 @@
+.contact_tile_container{
+    width: 100%;
+    /* border: 1px solid black; */
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 330px;
+    height: 72px;
+    box-sizing: border-box;
+    /* overflow: hidden; */
+    transition: 0.3ms ease-in;
+}
+.contact_tile_container:hover{
+    background-color: rgb(245, 245, 245);
+    cursor: pointer;
+}
+.contact_tile_main_container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.contact_profile_container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+.contact_image{
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+}
+.contact_name_and_message_container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    /* border: 1px solid black; */
+    padding: 0px;
+}
+.contact_name, .contact_msg{
+    margin: 0px;
+    color: black;
+}
+.contact_msg{
+    margin: 0px;
+    color: gray;
+    font-size: 12px;
+    justify-content: flex-start;
+    width: 177px;
+    height: 15px;
+    align-content: flex-start;
+    overflow: hidden;
+}
+.contact_tile_btn_container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}

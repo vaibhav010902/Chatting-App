@@ -1,0 +1,85 @@
+.chatcontact{
+    height: 100vh;
+    width: 330px;
+    /* border: 1px solid black; */
+    position: fixed;
+    top: 0;
+    left: 50px;
+    overflow: hidden;
+    border-right: 3px solid rgb(245,245,245);
+}
+
+.chatcontact_container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 20px;
+}
+
+.chatcontact_header_container{
+    width: 100%;
+    padding: 0px 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.chatcontact_header_container h1{
+    font-size: 27px;
+}
+
+.chatcontact_search_bar_container{
+    width: 100%;
+    padding: 0px 15px;
+}
+.chatcontact_search_bar_container input{
+    width: 100%;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 30px;
+    font-size: 15px;
+    margin: auto;
+    background-color: rgb(245,245,245);
+}
+.chatcontact_search_bar_container input:focus{
+    outline: 1px solid black;
+}
+.chatcontact_search_bar_container input::placeholder{
+    color: gray;
+    font-size: 14px;
+}
+
+.chatcontact_chat_filter_container{
+    width: 100%;
+    padding: 0px 15px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px 10px;
+}
+.chatcontact_chat_filter_container span{
+    font-size: 15px;
+    border: 1px solid black;
+    border-radius: 30px;
+    padding: 5px;
+}
+.chatcontact_chat_filter_container span:hover{
+    cursor: pointer;
+}
+
+.chatcontact_chats_container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+}

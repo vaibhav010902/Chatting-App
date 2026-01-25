@@ -1,0 +1,106 @@
+import React from "react";
+import styles from "./Sidebar.module.css";
+import authServices from "../../appwrite/auth";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout as authLogout } from "../../store/authSlice";
+
+function Sidebar({ activePanel, setActivePanel }) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  return (
+    <>
+      <nav className={styles.navbar}>
+        <div className={styles.navbar_container}>
+          <div className={styles.navbar_container_1}>
+            <div className={styles.profile_container}>
+              <span
+                className="material-symbols-outlined"
+                onClick={()=>setActivePanel("Profile")}
+                style={{
+                    padding: "8px 5px",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    backgroundColor: activePanel === "Profile" ? "rgb(245,245,245)" : "white",
+                    scale: activePanel === "Profile"? "0.97" : "1",
+                }}
+              >
+                account_circle
+              </span>
+            </div>
+            <div className={styles.btns_container}>
+              <span
+                className="material-symbols-outlined"
+                onClick={()=>setActivePanel("Friends")}
+                style={{
+                    backgroundColor: activePanel === "Friends" ? "rgb(245,245,245)" : "white",
+                    scale: activePanel === "Friends"? "0.97" : "1",
+                }}
+              >
+                chat
+              </span>
+              <span
+                className="material-symbols-outlined"
+                onClick={()=>setActivePanel("Contacts")}
+                style={{
+                    backgroundColor: activePanel === "Contacts" ? "rgb(245,245,245)" : "white",
+                    scale: activePanel === "Contacts"? "0.97" : "1",
+                }}
+              >
+                chat_add_on
+              </span>
+              <span
+                className="material-symbols-outlined"
+                onClick={()=>setActivePanel("Groups")}
+                style={{
+                    backgroundColor: activePanel === "Groups" ? "rgb(245,245,245)" : "white",
+                    scale: activePanel === "Groups"? "0.97" : "1",
+                }}
+              >
+                group
+              </span>
+              <span
+                className="material-symbols-outlined"
+                onClick={()=>setActivePanel("Friends")}
+                style={{
+                    backgroundColor: activePanel === "Friends" ? "rgb(245,245,245)" : "white",
+                    scale: activePanel === "Friends"? "0.97" : "1",
+                }}
+              >
+                person_add
+              </span>
+            </div>
+          </div>
+          <div className={styles.navbar_container_2}>
+            <span
+              className="material-symbols-outlined"
+              onClick={()=>setActivePanel("Settings")}
+              style={{
+                backgroundColor: activePanel === "Settings" ? "rgb(245,245,245)" : "white",
+                scale: activePanel === "Settings"? "0.97" : "1",
+            }}
+            >
+              settings
+            </span>
+            <span
+              className="material-symbols-outlined"
+              onClick={async () => {
+                try {
+                  await authServices.logoutAccount();
+                  dispatch(authLogout());
+                  navigate("/");
+                } catch (error) {
+                  console.log("error", error);
+                }
+              }}
+            >
+              logout
+            </span>
+          </div>
+        </div>
+      </nav>
+    </>
+  );
+}
+
+export default Sidebar;

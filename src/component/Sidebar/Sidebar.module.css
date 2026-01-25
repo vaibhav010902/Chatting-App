@@ -1,0 +1,84 @@
+.navbar {
+    width: 50px;
+    height: 100vh;
+    border-right: 3px solid rgb(245, 245, 245);
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 5px;
+}
+
+.navbar_container {
+    width: 100%;
+    height: 100%;
+    /* border: 1px solid black; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0px;
+}
+
+.navbar_container_1 {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.profile_container{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.profile_container span{
+    font-size: 30px;
+    font-weight: 300;
+}
+
+.btns_container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 13px;
+}
+
+.btns_container span {
+    width: 100%;
+    padding: 8px 5px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 400;
+    transition: 0.7ms ease-in;
+    cursor: pointer;
+    /* font-size: 23px; */
+}
+.btns_container span:hover{
+    cursor: pointer;
+    background-color: rgb(245,245,245);
+    scale: 0.97;
+}
+
+.navbar_container_2{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 13px;
+}
+.navbar_container_2 span{
+    width: 100%;
+    padding: 8px 5px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 400;
+    transition: 0.7ms ease-in;
+}
+.navbar_container_2 span:hover{
+    cursor: pointer;
+    background-color: rgb(245, 245, 245);
+    scale: 0.97;
+}
