@@ -122,11 +122,10 @@ function ChatPanel({ currentChat, userProfile }) {
   //         console.error("Upload failed:", error);
   //       }
   //     };
-    
+
   //     uploadAll();
   //     // return;
   //   }
-    
 
   //   const message = {
   //     id: ID.unique(),
@@ -171,7 +170,7 @@ function ChatPanel({ currentChat, userProfile }) {
     const isNotFriend = !userProfile.friends.some(
       (friend) => friend === currentChat?.$id
     );
-  
+
     if (isNotFriend) {
       try {
         await profileServices.updateProfile({
@@ -190,29 +189,26 @@ function ChatPanel({ currentChat, userProfile }) {
         console.error("Failed to update friends", error);
       }
     }
-  
+
     // 2️⃣ UPLOAD MEDIA (WAIT HERE ⏳)
     let mediaFiles = [];
-  
+
     if (imageFiles.length > 0) {
       try {
         mediaFiles = await Promise.all(
           imageFiles.map(async ({ fileID, file }) => {
             const uploaded = await storageServices.uploadFile({ fileID, file });
-            return {
-              id: fileID,
-              mediaUrl: uploaded,
-            };
+            return uploaded; // just the URL string
           })
         );
-  
-        console.log("Uploaded files:", mediaFiles);
+
+        // console.log("Uploaded files:", mediaFiles);
       } catch (error) {
         console.error("Upload failed:", error);
         return; // stop message sending if upload fails
       }
     }
-  
+
     // 3️⃣ CREATE MESSAGE (NOW mediaFiles IS READY ✅)
     const message = {
       id: ID.unique(),
@@ -226,22 +222,19 @@ function ChatPanel({ currentChat, userProfile }) {
       deleted: false,
       conversationId: getConversationId(),
     };
-  
+
     // 4️⃣ SEND MESSAGE
     try {
       const response = await messagesService.sendMessage(message);
-      if (!response) {
-        console.log("Message Not Sent");
-        return;
-      }
     } catch (error) {
       console.log("Something went wrong! Unable to send your message");
     }
-  
+
     // 5️⃣ RESET UI
     setText("");
+    setImageFiles([]);
   };
-  
+
   const getMessage = async () => {
     try {
       // const userId = userData.$id;
