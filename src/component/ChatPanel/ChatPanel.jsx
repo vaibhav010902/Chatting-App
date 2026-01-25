@@ -53,106 +53,106 @@ function ChatPanel({ currentChat, userProfile }) {
     return [userData.$id, currentChat?.$id].sort().join("-");
   };
 
-  const sendMessage = async () => {
-    const isNotFriend = !userProfile.friends.some(
-      (friend) => friend == currentChat?.$id
-    );
-    // CHECK IF THE CURRENT CHAT IS FRIEND OF CURRENT USER ON NOT
-    if (isNotFriend) {
-      const updatedFriends = [...userProfile.friends, currentChat?.$id];
-      // PUSH CURRENT CHAT INTO THE FRIENDS ARRAY
-      try {
-        await profileServices.updateProfile({
-          userId: userProfile.$id,
-          first_name: userProfile.first_name,
-          last_name: userProfile.last_name,
-          email: userProfile.email,
-          phone: userProfile.phone,
-          dob: userProfile.dob,
-          status: userProfile.status,
-          profile: userProfile.profile_image,
-          friends: updatedFriends,
-          $createdAt: userProfile.$createdAt,
-        });
-      } catch (error) {
-        console.error("Failed to update friends", error);
-      }
-    }
-    // IF NOT -> UPDATE THE FIRENDS ARRAY OF CURRENT USER
-    // const [mediaFiles,setMediaFiles] = useState([]);
+  // const sendMessage = async () => {
+  //   const isNotFriend = !userProfile.friends.some(
+  //     (friend) => friend == currentChat?.$id
+  //   );
+  //   // CHECK IF THE CURRENT CHAT IS FRIEND OF CURRENT USER ON NOT
+  //   if (isNotFriend) {
+  //     const updatedFriends = [...userProfile.friends, currentChat?.$id];
+  //     // PUSH CURRENT CHAT INTO THE FRIENDS ARRAY
+  //     try {
+  //       await profileServices.updateProfile({
+  //         userId: userProfile.$id,
+  //         first_name: userProfile.first_name,
+  //         last_name: userProfile.last_name,
+  //         email: userProfile.email,
+  //         phone: userProfile.phone,
+  //         dob: userProfile.dob,
+  //         status: userProfile.status,
+  //         profile: userProfile.profile_image,
+  //         friends: updatedFriends,
+  //         $createdAt: userProfile.$createdAt,
+  //       });
+  //     } catch (error) {
+  //       console.error("Failed to update friends", error);
+  //     }
+  //   }
+  //   // IF NOT -> UPDATE THE FIRENDS ARRAY OF CURRENT USER
+  //   // const [mediaFiles,setMediaFiles] = useState([]);
 
-    // if (imageFiles.length > 0) {
-    //   const uploadAll = async () => {
-    //     const uploads = imageFiles.map(({ fileID, file }) => ({
-    //       id: fileID,
-    //       media: storageServices.uploadFile({ fileID, file }),
-    //     }));
+  //   // if (imageFiles.length > 0) {
+  //   //   const uploadAll = async () => {
+  //   //     const uploads = imageFiles.map(({ fileID, file }) => ({
+  //   //       id: fileID,
+  //   //       media: storageServices.uploadFile({ fileID, file }),
+  //   //     }));
 
-    //     // const mediaUrl = await Promise.all({ uploads });
-    //     const mediaUrl = await Promise.all(
-    //       uploads.map(({ id, media }) =>
-    //         media.then((res) => ({
-    //           id,
-    //           mediaUrl: media,
-    //         }))
-    //       )
-    //     );
-    //     console.log("Uploaded files:", mediaUrl);
-    //     return;
-    //   };
-    //   uploadAll();
-    // }
-    let mediaFiles = [];
-    if (imageFiles.length > 0) {
-      const uploadAll = async () => {
-        try {
-          const mediaFiles = await Promise.all(
-            imageFiles.map(async ({ fileID, file }) => {
-              const uploaded = await storageServices.uploadFile({ fileID, file });
-              console.log("Uploaded file:", uploaded);
-              return {
-                id: fileID,
-                mediaUrl: uploaded,
-              };
-            })
-          );
-          console.log("Uploaded files:", mediaFiles);
-          return;
-        } catch (error) {
-          console.error("Upload failed:", error);
-        }
-      };
+  //   //     // const mediaUrl = await Promise.all({ uploads });
+  //   //     const mediaUrl = await Promise.all(
+  //   //       uploads.map(({ id, media }) =>
+  //   //         media.then((res) => ({
+  //   //           id,
+  //   //           mediaUrl: media,
+  //   //         }))
+  //   //       )
+  //   //     );
+  //   //     console.log("Uploaded files:", mediaUrl);
+  //   //     return;
+  //   //   };
+  //   //   uploadAll();
+  //   // }
+  //   let mediaFiles = [];
+  //   if (imageFiles.length > 0) {
+  //     const uploadAll = async () => {
+  //       try {
+  //         const mediaFiles = await Promise.all(
+  //           imageFiles.map(async ({ fileID, file }) => {
+  //             const uploaded = await storageServices.uploadFile({ fileID, file });
+  //             console.log("Uploaded file:", uploaded);
+  //             return {
+  //               id: fileID,
+  //               mediaUrl: uploaded,
+  //             };
+  //           })
+  //         );
+  //         console.log("Uploaded files:", mediaFiles);
+  //         return;
+  //       } catch (error) {
+  //         console.error("Upload failed:", error);
+  //       }
+  //     };
     
-      uploadAll();
-      // return;
-    }
+  //     uploadAll();
+  //     // return;
+  //   }
     
 
-    const message = {
-      id: ID.unique(),
-      chatId: currentChat?.$id,
-      senderId: userData.$id,
-      type: null,
-      content: text == "" ? "" : text,
-      mediaUrl: mediaFiles,
-      createdAt: new Date().toISOString(),
-      edited: false,
-      deleted: false,
-      conversationId: getConversationId(),
-    };
+  //   const message = {
+  //     id: ID.unique(),
+  //     chatId: currentChat?.$id,
+  //     senderId: userData.$id,
+  //     type: null,
+  //     content: text == "" ? "" : text,
+  //     mediaUrl: mediaFiles,
+  //     createdAt: new Date().toISOString(),
+  //     edited: false,
+  //     deleted: false,
+  //     conversationId: getConversationId(),
+  //   };
 
-    try {
-      const response = await messagesService.sendMessage(message);
-      if (!response) {
-        console.log("Message Not Sent");
-        return;
-      }
-    } catch (error) {
-      console.log("Something went wrong! Unable to send your message");
-    }
+  //   try {
+  //     const response = await messagesService.sendMessage(message);
+  //     if (!response) {
+  //       console.log("Message Not Sent");
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     console.log("Something went wrong! Unable to send your message");
+  //   }
 
-    setText("");
-  };
+  //   setText("");
+  // };
 
   // const getUser = async () =>{
   //   try {
@@ -166,6 +166,82 @@ function ChatPanel({ currentChat, userProfile }) {
   //     console.log("Something went wrong: ", error);
   //   }
   // }
+  const sendMessage = async () => {
+    // 1️⃣ FRIEND CHECK
+    const isNotFriend = !userProfile.friends.some(
+      (friend) => friend === currentChat?.$id
+    );
+  
+    if (isNotFriend) {
+      try {
+        await profileServices.updateProfile({
+          userId: userProfile.$id,
+          first_name: userProfile.first_name,
+          last_name: userProfile.last_name,
+          email: userProfile.email,
+          phone: userProfile.phone,
+          dob: userProfile.dob,
+          status: userProfile.status,
+          profile: userProfile.profile_image,
+          friends: [...userProfile.friends, currentChat?.$id],
+          $createdAt: userProfile.$createdAt,
+        });
+      } catch (error) {
+        console.error("Failed to update friends", error);
+      }
+    }
+  
+    // 2️⃣ UPLOAD MEDIA (WAIT HERE ⏳)
+    let mediaFiles = [];
+  
+    if (imageFiles.length > 0) {
+      try {
+        mediaFiles = await Promise.all(
+          imageFiles.map(async ({ fileID, file }) => {
+            const uploaded = await storageServices.uploadFile({ fileID, file });
+            return {
+              id: fileID,
+              mediaUrl: uploaded,
+            };
+          })
+        );
+  
+        console.log("Uploaded files:", mediaFiles);
+      } catch (error) {
+        console.error("Upload failed:", error);
+        return; // stop message sending if upload fails
+      }
+    }
+  
+    // 3️⃣ CREATE MESSAGE (NOW mediaFiles IS READY ✅)
+    const message = {
+      id: ID.unique(),
+      chatId: currentChat?.$id,
+      senderId: userData.$id,
+      type: null,
+      content: text || "",
+      mediaUrl: mediaFiles,
+      createdAt: new Date().toISOString(),
+      edited: false,
+      deleted: false,
+      conversationId: getConversationId(),
+    };
+  
+    // 4️⃣ SEND MESSAGE
+    try {
+      const response = await messagesService.sendMessage(message);
+      if (!response) {
+        console.log("Message Not Sent");
+        return;
+      }
+    } catch (error) {
+      console.log("Something went wrong! Unable to send your message");
+    }
+  
+    // 5️⃣ RESET UI
+    setText("");
+  };
+  
   const getMessage = async () => {
     try {
       // const userId = userData.$id;
