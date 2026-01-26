@@ -172,7 +172,7 @@ function ChatPanel({ currentChat, userProfile }) {
   //   }
   // }
   const sendMessage = async () => {
-    // 1️⃣ FRIEND CHECK
+    // FRIEND CHECK
     const isNotFriend = !userProfile.friends.some(
       (friend) => friend === currentChat?.$id
     );
@@ -196,7 +196,7 @@ function ChatPanel({ currentChat, userProfile }) {
       }
     }
 
-    // 2️⃣ UPLOAD MEDIA (WAIT HERE ⏳)
+    // UPLOAD MEDIA (WAIT HERE)
     let mediaFiles = [];
 
     if (imageFiles.length > 0) {
@@ -208,15 +208,13 @@ function ChatPanel({ currentChat, userProfile }) {
             return uploaded; // just the URL string
           })
         );
-
-        // console.log("Uploaded files:", mediaFiles);
       } catch (error) {
         console.error("Upload failed:", error);
         return; // stop message sending if upload fails
       }
     }
 
-    // 3️⃣ CREATE MESSAGE (NOW mediaFiles IS READY ✅)
+    // CREATE MESSAGE (NOW mediaFiles IS READY ✅)
     const message = {
       id: ID.unique(),
       chatId: currentChat?.$id,
@@ -230,14 +228,14 @@ function ChatPanel({ currentChat, userProfile }) {
       conversationId: getConversationId(),
     };
 
-    // 4️⃣ SEND MESSAGE
+    // SEND MESSAGE
     try {
       const response = await messagesService.sendMessage(message);
     } catch (error) {
       console.log("Something went wrong! Unable to send your message");
     }
 
-    // 5️⃣ RESET UI
+    // RESET UI
     setText("");
     setImageFiles([]);
   };
@@ -278,7 +276,6 @@ function ChatPanel({ currentChat, userProfile }) {
 
   const handleFile = async (e) => {
     const files = Array.from(e.target.files);
-    console.log("Files: ", files);
     if (files.length === 0) return;
 
     const mappedFiles = files.map((file) => ({
@@ -286,14 +283,9 @@ function ChatPanel({ currentChat, userProfile }) {
       file,
       fileUrl: URL.createObjectURL(file),
     }));
-    console.log("Mapped Files: ", mappedFiles);
     setImageFiles((prev) => [...prev, ...mappedFiles]);
 
-    // e.target.files = null;  //FIX THE BUG
-    // if(imageFiles.length > 0){
-      // console.log(e.target.value)
-      e.target.value = null;
-    // }
+    e.target.value = null;    // FIX THE BUG (WHEN TRYING TO UPLOAD SAME NO. OF FILES RIGHT AFTER REMOVING THE PREVIOUS IMAGES FROM INPUT PREVIEW PANEL, IT DOESN'T GET UPLOADED...)
   };
   const handleRemoveFile = (fileID) => {
     const fileToRemove = imageFiles.find((file) => file.fileID === fileID);
@@ -301,40 +293,44 @@ function ChatPanel({ currentChat, userProfile }) {
       URL.revokeObjectURL(fileToRemove.fileUrl);
     }
     const updatedFiles = imageFiles.filter((file) => file.fileID !==fileID);
-    // console.log("Updated Files: ", updatedFiles);
-    // console.log("Image Files: ", imageFiles);
     setImageFiles(updatedFiles);
     // setImageFiles((prev) =>
     //   prev.filter((file) => file.fileID !== fileID)
     // );
-    // console.log("setImageFiles: ",imageFiles);
   }
 
   const startRecording = async () => {
     const micStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
-    });
-    setStream(micStream);
-    setIsRecording(true);
+    });    // ASKS BROWSER FOR MIC ACCESS
+    console.log("micStream: ",micStream);
+    setStream(micStream);    // SET THE STREAM
+    setIsRecording(true);    // TRIGGER WAVEFORM RENDERING
 
     mediaRecorderRef.current = new MediaRecorder(micStream);
     audioChunksRef.current = [];
-    mediaRecorderRef.current.start();
+    mediaRecorderRef.current.start();    // START RECORDING
+    console.log("mediaRecorderRef: ",mediaRecorderRef.current);
 
-    mediaRecorderRef.current.ondataavailable = (e) =>
+    mediaRecorderRef.current.ondataavailable = (e) =>    
       audioChunksRef.current.push(e.data);
+      console.log("audioChunksRef.current", audioChunksRef.current)    // AUDIO COMES IN CHUNKS. WHEN RECORDING STOPS, WE GET ALL THE CHUNKS IN ONDATAAVAILABLE EVENT.
   };
 
   const stopRecording = async () => {
-    mediaRecorderRef.current.stop();
+    setIsRecording(false);    // STOP WAVEFORM RENDERING
+    stream.getTracks().forEach(track => track.stop());    // FREES MICROPHONE, PREVNETS "MIC STILL IN USE" BUG.
+    mediaRecorderRef.current.stop();    // FINALIZE AUDIO FILE
+    console.log(mediaRecorderRef)
+    // mediaRecorderRef.current.stop();
 
-    mediaRecorderRef.current.onstop = async () => {
+    // mediaRecorderRef.current.onstop = async () => {
       // const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
       // const file = new File([blob], "voice.webm");
-      setIsRecording(false);
-      stream.getTracks().forEach((track) => track.stop());
-      mediaRecorderRef.current.stop();
-      console.log("Audio File: ", stream);
+      // setIsRecording(false);
+      // stream.getTracks().forEach((track) => track.stop());
+      // mediaRecorderRef.current.stop();
+      // console.log("Audio File: ", stream);
 
       // const uploaded = await storageService.uploadFile(file);
 
@@ -345,7 +341,7 @@ function ChatPanel({ currentChat, userProfile }) {
       //   content: uploaded.$id,
       //   fileUrl: storageService.getFileView(uploaded.$id),
       // });
-    };
+    // };
   };
 
   return (

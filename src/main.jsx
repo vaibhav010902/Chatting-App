@@ -10,6 +10,7 @@ import { Home, Login, Signup } from './pages/index.js'
 import { ChatPanel, Loading } from "./component/index.js";
 import Profile from "./component/Profile/Profile.jsx";
 import AuthLayout from "./component/AuthLayout.jsx";
+import { SettingPanel } from "./sidebar_panels/sidebar_panels.js";
 // import UserHome from "./component/index.js";
 
 const router = createBrowserRouter([
@@ -48,7 +49,11 @@ const router = createBrowserRouter([
       {
         path: "/loading",
         element: <Loading/>
-      }
+      },
+      {
+        path: "/sidebar",
+        element: <SettingPanel/>
+      },
     ],
   },
 ]);
