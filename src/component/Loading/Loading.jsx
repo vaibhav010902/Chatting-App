@@ -5,14 +5,11 @@ import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 
 function Loading() {
-  const [emoji,setEmoji] = useState("")
-  console.log(emoji)
   return (
 
-    // <div className="loading-page">
-    //   <div className="loading">LOADING....</div>
-    // </div>
-    <Picker data={data} onEmojiSelect={(e) => setEmoji(e.native)} />
+    <div className="loading-page">
+      <div className="loading">LOADING....</div>
+    </div>
   )
 }
 

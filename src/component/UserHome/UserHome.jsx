@@ -98,9 +98,10 @@ function UserHome() {
   }, [userData]);
   // console.log(friends);
   useEffect(() => {
-    if (Array.isArray(friends)) {
+    if (Array.isArray(friends) && Array.isArray(users) && Array.isArray(userProfile)) {
       console.log("Friends:", friends);
       setLoading(false);
+      console.log(loading)
     }
   },[friends])
 
