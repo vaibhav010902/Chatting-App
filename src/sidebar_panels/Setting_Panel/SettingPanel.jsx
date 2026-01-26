@@ -32,7 +32,12 @@ function SettingPanel({ userProfile }) {
               alt=""
               className={styles.user_profile_image}
             />
-            <p>Vaibhav</p>
+            <div className={styles.profile_content_container}>
+                <p className={styles.profile_firstname}>{userProfile?.first_name}</p>
+                <p className={styles.profile_status}>
+                  {userProfile?.status}
+                </p>
+              </div>
           </div>
           </div>
           <div className={styles.settings_panel_content_container}>

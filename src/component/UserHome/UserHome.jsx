@@ -48,7 +48,7 @@ function UserHome() {
     },
     {
       name: "Settings",
-      component: <SettingPanel />,
+      component: <SettingPanel userProfile={userProfile}/>,
       status: false,
     },
   ];
