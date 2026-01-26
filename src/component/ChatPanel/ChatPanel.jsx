@@ -17,6 +17,7 @@ import { client } from "../../appwrite/config";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import storageServices from "../../appwrite/storage";
+import VoiceWaveform from "../VoiceWaveform";
 
 function ChatPanel({ currentChat, userProfile }) {
   // console.log("Inside Chat Panel Component....")
@@ -26,6 +27,11 @@ function ChatPanel({ currentChat, userProfile }) {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
+  // const fileRef = useRef();
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const [stream, setStream] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
 
   const userData = useSelector((state) => state.auth.userData);
   // console.log("Inside Chat Panel", userData, currentChat, userProfile);
@@ -196,8 +202,9 @@ function ChatPanel({ currentChat, userProfile }) {
     if (imageFiles.length > 0) {
       try {
         mediaFiles = await Promise.all(
-          imageFiles.map(async ({ fileID, file }) => {
+          imageFiles.map(async ({ fileID, file, fileUrl }) => {
             const uploaded = await storageServices.uploadFile({ fileID, file });
+            URL.revokeObjectURL(fileUrl);
             return uploaded; // just the URL string
           })
         );
@@ -271,25 +278,74 @@ function ChatPanel({ currentChat, userProfile }) {
 
   const handleFile = async (e) => {
     const files = Array.from(e.target.files);
+    console.log("Files: ", files);
     if (files.length === 0) return;
 
-    console.log("Files:", files);
     const mappedFiles = files.map((file) => ({
       fileID: ID.unique(),
       file,
+      fileUrl: URL.createObjectURL(file),
     }));
     console.log("Mapped Files: ", mappedFiles);
     setImageFiles((prev) => [...prev, ...mappedFiles]);
 
-    // const uploaded = await storageService.uploadFile(file);
+    // e.target.files = null;  //FIX THE BUG
+    // if(imageFiles.length > 0){
+      // console.log(e.target.value)
+      e.target.value = null;
+    // }
+  };
+  const handleRemoveFile = (fileID) => {
+    const fileToRemove = imageFiles.find((file) => file.fileID === fileID);
+    if (fileToRemove){
+      URL.revokeObjectURL(fileToRemove.fileUrl);
+    }
+    const updatedFiles = imageFiles.filter((file) => file.fileID !==fileID);
+    // console.log("Updated Files: ", updatedFiles);
+    // console.log("Image Files: ", imageFiles);
+    setImageFiles(updatedFiles);
+    // setImageFiles((prev) =>
+    //   prev.filter((file) => file.fileID !== fileID)
+    // );
+    // console.log("setImageFiles: ",imageFiles);
+  }
 
-    // await databaseService.sendMessage({
-    //   chatId,
-    //   senderId: userId,
-    //   type: file.type.startsWith("image") ? "image" : "file",
-    //   content: uploaded.$id,
-    //   fileUrl: storageService.getFilePreview(uploaded.$id),
-    // });
+  const startRecording = async () => {
+    const micStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
+    setStream(micStream);
+    setIsRecording(true);
+
+    mediaRecorderRef.current = new MediaRecorder(micStream);
+    audioChunksRef.current = [];
+    mediaRecorderRef.current.start();
+
+    mediaRecorderRef.current.ondataavailable = (e) =>
+      audioChunksRef.current.push(e.data);
+  };
+
+  const stopRecording = async () => {
+    mediaRecorderRef.current.stop();
+
+    mediaRecorderRef.current.onstop = async () => {
+      // const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      // const file = new File([blob], "voice.webm");
+      setIsRecording(false);
+      stream.getTracks().forEach((track) => track.stop());
+      mediaRecorderRef.current.stop();
+      console.log("Audio File: ", stream);
+
+      // const uploaded = await storageService.uploadFile(file);
+
+      // await databaseService.sendMessage({
+      //   chatId,
+      //   senderId: userId,
+      //   type: "voice",
+      //   content: uploaded.$id,
+      //   fileUrl: storageService.getFileView(uploaded.$id),
+      // });
+    };
   };
 
   return (
@@ -300,7 +356,7 @@ function ChatPanel({ currentChat, userProfile }) {
           <p>
             {currentChat?.$id
               ? currentChat.first_name + " " + currentChat.last_name
-              : "Dummy"}
+              : "No User Selected"}
           </p>
         </div>
         <div className={styles.chat_panel_header_btn_container}>
@@ -332,7 +388,7 @@ function ChatPanel({ currentChat, userProfile }) {
             multiple
             hidden
             ref={fileRef}
-            onChange={handleFile}
+            onChange={(e) => handleFile(e)}
           />
           <span
             className="material-symbols-outlined"
@@ -344,10 +400,10 @@ function ChatPanel({ currentChat, userProfile }) {
             <span className={styles.input_image_panel}>
               {imageFiles.map((image) => (
                 <span key={image.fileID}>
-                  <span className="material-symbols-outlined">cancel</span>
+                  <span className="material-symbols-outlined" onClick={()=> handleRemoveFile(image.fileID)}>cancel</span>
                   <img
-                    src={image.imageFile + "&mode=admin"}
-                    alt=""
+                    src={image.fileUrl}
+                    alt="Preview Not Available"
                     style={{
                       width: "80px",
                       height: "90px",
@@ -385,7 +441,18 @@ function ChatPanel({ currentChat, userProfile }) {
             onChange={(e) => setText(e.target.value)}
           />
           {text == "" && imageFiles.length == 0 ? (
-            <span className="material-symbols-outlined">mic</span>
+            <>
+              {isRecording && (
+                <VoiceWaveform stream={stream} isRecording={isRecording} />
+              )}
+              <span
+                className="material-symbols-outlined"
+                onMouseDown={startRecording}
+                onMouseUp={stopRecording}
+              >
+                mic
+              </span>
+            </>
           ) : (
             <span className="material-symbols-outlined" onClick={sendMessage}>
               send
