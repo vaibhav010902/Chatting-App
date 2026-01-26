@@ -68,6 +68,36 @@ export class MessagesService{
             throw error;
         }
     }
+
+    async deleteMessage(msgId){
+        try {
+            await this.databases.deleteDocument(
+                conf.appwriteDatabaseID,
+                conf.appwriteMessagesCollectionID,
+                msgId
+            )
+            console.log("Message deleted successfully");
+        } catch (error) {
+            console.log("Appwrite Messages Service :: deleteMessage :: error: ", error);
+            throw error;
+        }
+    }
+
+    async editMessage(msgId, content){
+        try {
+            await this.databases.updateDocument(
+                conf.appwriteDatabaseID,
+                conf.appwriteMessagesCollectionID,
+                msgId,
+                {
+                    content
+                }
+            )
+        } catch (error) {
+            console.log("Appwrite Messages Service :: editMessage :: error: ", error);
+            throw error;
+        }
+    }
 }
 
 const messagesService = new MessagesService();

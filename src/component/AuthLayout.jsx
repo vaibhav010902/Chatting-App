@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import profileServices from "../appwrite/profileServices";
+import Loading from "./Loading/Loading";
 
 function AuthLayout({ children, isAuthenticated = true }) {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ function AuthLayout({ children, isAuthenticated = true }) {
     checkAuthAndProfile();
   }, [status, userData, isAuthenticated, navigate]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading/>;
 
   return <>{children}</>;
 }

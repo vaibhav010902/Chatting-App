@@ -18,7 +18,7 @@ function UserHome() {
   const [messages, setMessages] = useState([]);
   const [contact, setContact] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentChat, setCurrentChat] = useState({});
+  const [currentChat, setCurrentChat] = useState("");
   const [activePanel, setActivePanel] = useState("Friends");
   const [users, setUsers] = useState([]);
   const [friends, setFriends] = useState(null);
@@ -114,7 +114,7 @@ function UserHome() {
         <>
           <Sidebar activePanel={activePanel} setActivePanel={setActivePanel} />
           {activePanelComponent}
-          {currentChat?.$id && <ChatPanel currentChat={currentChat} userProfile={userProfile} />}
+          {currentChat?.$id && <ChatPanel currentChat={currentChat} setCurrentChat={setCurrentChat} userProfile={userProfile} />}
           
         </>
       ) }

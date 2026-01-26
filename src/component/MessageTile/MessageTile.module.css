@@ -8,6 +8,7 @@
     gap: 5px;
     background-color: white;
     border: none;
+    position: relative;
 }
 
 .image_container {
@@ -61,5 +62,34 @@
 } */
 .message_container span:hover{
     opacity: 1;
+    cursor: pointer;
+}
+
+.option_panel{
+    position: absolute;
+    right: 0;
+    bottom: -280%;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0px 6px 10px rgba(0,0,0,0.1)
+}
+
+.option_panel button,input{
+    border: none;
+    background-color: white;
+    /* border: 1px solid black; */
+    font-size: 11px;
+    font-weight: 500;
+    padding: 7px;
+    width: 100%;
+}
+.option_panel button:hover{
+    background-color: rgb(245,245,245);
     cursor: pointer;
 }

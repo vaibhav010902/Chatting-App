@@ -19,13 +19,9 @@ function ChatContact({ friends, setCurrentChat }) {
     setFilterUser(friends);
     console.log(text);
   }, [text,friends]);    // BUG FIXED BY ADDING FRIENDS ARRAY IN USEEFFECT DEPENDENCY ARRAY
-  console.log(Array.isArray(friends))
 
   return (
     <>
-      {friends==null ? (
-        <Loading />
-      ) : (
         <div className={styles.chatcontact}>
           <div className={styles.chatcontact_container}>
             <div className={styles.chatcontact_header_container}>
@@ -65,7 +61,6 @@ function ChatContact({ friends, setCurrentChat }) {
             </div>
           </div>
         </div>
-      )}
     </>
   );
 }

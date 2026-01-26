@@ -21,7 +21,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 15px;
+    padding: 15px 15px;
     background-color: white;
     color: white;
     /* border-radius: 10px; */
@@ -37,6 +37,12 @@
     font-weight: 350;
     cursor: pointer;
     color: black;
+    padding: 7px;
+    border-radius: 50%;
+}
+.chat_panel_header_container_1 span:hover{
+    background-color: rgb(245, 245, 245);
+    transform: scale(0.97);
 }
 .chat_panel_header_container_1 p{
     color: black;

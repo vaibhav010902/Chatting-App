@@ -19,7 +19,7 @@ import Picker from "@emoji-mart/react";
 import storageServices from "../../appwrite/storage";
 import VoiceWaveform from "../VoiceWaveform";
 
-function ChatPanel({ currentChat, userProfile }) {
+function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
   // console.log("Inside Chat Panel Component....")
   const [emoji, setEmoji] = useState("");
   const [emojiVisibility, setEmojiVisibility] = useState(false);
@@ -251,6 +251,22 @@ function ChatPanel({ currentChat, userProfile }) {
     }
   };
 
+  const deleteMessage = async (msgId) => {
+    console.log("Delete Message",msgId);
+    try {
+      await messagesService.deleteMessage(msgId)
+    } catch (error) {
+      console.log("Something went wrong: ", error);
+    }
+  }
+
+  const editMessage = (msgId, editText) => {
+    console.log("Edit Message",msgId);
+    console.log("Edit Message",editText);
+  }
+
+
+
   useEffect(() => {
     if (!currentChat?.$id) return;
     getMessage();
@@ -348,7 +364,7 @@ function ChatPanel({ currentChat, userProfile }) {
     <div className={styles.chat_panel_container}>
       <div className={styles.chat_panel_header_container}>
         <div className={styles.chat_panel_header_container_1}>
-          <span className="material-symbols-outlined">arrow_back</span>
+          <span className="material-symbols-outlined" onClick={() => setCurrentChat("")}>arrow_back</span>
           <p>
             {currentChat?.$id
               ? currentChat.first_name + " " + currentChat.last_name
@@ -367,11 +383,15 @@ function ChatPanel({ currentChat, userProfile }) {
           {messages?.map((msg) => (
             <MessageTile
               key={msg.$id}
+              msgId={msg.$id}
               message={msg.content}
               mediaUrl={msg.mediaUrl}
               messanger={
                 msg.senderId == currentChat.$id ? "sender" : "receiver"
               }
+              deleteMessage={deleteMessage}
+              editMessage={editMessage}
+              time={msg.createdAt}
             />
           ))}
         </ul>
