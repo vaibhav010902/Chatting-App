@@ -10,6 +10,7 @@ import { Home, Login, Signup } from './pages/index.js'
 import { ChatPanel, Loading } from "./component/index.js";
 import Profile from "./component/Profile/Profile.jsx";
 import AuthLayout from "./component/AuthLayout.jsx";
+import Root from "./component/Root.jsx";
 import { SettingPanel } from "./sidebar_panels/sidebar_panels.js";
 // import UserHome from "./component/index.js";
 
@@ -52,7 +53,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/sidebar",
-        element: <SettingPanel/>
+        element: <Root/>
       },
     ],
   },

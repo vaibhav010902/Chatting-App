@@ -18,23 +18,31 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import storageServices from "../../appwrite/storage";
 import VoiceWaveform from "../VoiceWaveform";
+import { generateWaveform } from "../utils/generateWaveform";
 
-function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
-  // console.log("Inside Chat Panel Component....")
-  const [emoji, setEmoji] = useState("");
+function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
   const [emojiVisibility, setEmojiVisibility] = useState(false);
   const fileRef = useRef();
   const [text, setText] = useState("");
   const [messages, setMessages] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
-  // const fileRef = useRef();
+
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const [stream, setStream] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [previewFile, setPreviewFile] = useState(null);
+  const [previewType, setPreviewType] = useState(null);
+  const [previewWaveform, setPreviewWaveform] = useState(null);
+  const cancelRecordingRef = useRef(false);
 
   const userData = useSelector((state) => state.auth.userData);
-  // console.log("Inside Chat Panel", userData, currentChat, userProfile);
+  const [micVisibility, setMicVisibility] = useState(true);
+  const [micStopVisibility, setMicStopVisibility] = useState(false);
+  const [recordingCancelVisibility, setRecordingCancelVisibility] =
+    useState(false);
+  const [sendBtnVisibility, setSendBtnVisibility] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   // const dispatch = useDispatch();
   // const messages = useSelector((state) => state.chat.messages);
@@ -172,6 +180,10 @@ function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
   //   }
   // }
   const sendMessage = async () => {
+    setMicVisibility(true);
+    setMicStopVisibility(false);
+    setRecordingCancelVisibility(false);
+    setSendBtnVisibility(false);
     // FRIEND CHECK
     const isNotFriend = !userProfile.friends.some(
       (friend) => friend === currentChat?.$id
@@ -252,20 +264,18 @@ function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
   };
 
   const deleteMessage = async (msgId) => {
-    console.log("Delete Message",msgId);
+    console.log("Delete Message", msgId);
     try {
-      await messagesService.deleteMessage(msgId)
+      await messagesService.deleteMessage(msgId);
     } catch (error) {
       console.log("Something went wrong: ", error);
     }
-  }
+  };
 
   const editMessage = (msgId, editText) => {
-    console.log("Edit Message",msgId);
-    console.log("Edit Message",editText);
-  }
-
-
+    console.log("Edit Message", msgId);
+    console.log("Edit Message", editText);
+  };
 
   useEffect(() => {
     if (!currentChat?.$id) return;
@@ -301,70 +311,159 @@ function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
     }));
     setImageFiles((prev) => [...prev, ...mappedFiles]);
 
-    e.target.value = null;    // FIX THE BUG (WHEN TRYING TO UPLOAD SAME NO. OF FILES RIGHT AFTER REMOVING THE PREVIOUS IMAGES FROM INPUT PREVIEW PANEL, IT DOESN'T GET UPLOADED...)
+    e.target.value = null; // FIX THE BUG (WHEN TRYING TO UPLOAD SAME NO. OF FILES RIGHT AFTER REMOVING THE PREVIOUS IMAGES FROM INPUT PREVIEW PANEL, IT DOESN'T GET UPLOADED...)
   };
   const handleRemoveFile = (fileID) => {
     const fileToRemove = imageFiles.find((file) => file.fileID === fileID);
-    if (fileToRemove){
+    if (fileToRemove) {
       URL.revokeObjectURL(fileToRemove.fileUrl);
     }
-    const updatedFiles = imageFiles.filter((file) => file.fileID !==fileID);
+    const updatedFiles = imageFiles.filter((file) => file.fileID !== fileID);
     setImageFiles(updatedFiles);
     // setImageFiles((prev) =>
     //   prev.filter((file) => file.fileID !== fileID)
     // );
-  }
+  };
+
+  const handleMicBtnClick = () => {
+    startRecording();
+    setMicVisibility(false);
+    setSendBtnVisibility(false);
+    setMicStopVisibility(true);
+    setRecordingCancelVisibility(true);
+    return;
+  };
+
+  const handleStopRecordingBtnClick = () => {
+    stopRecording();
+    setSendBtnVisibility(true);
+    setMicStopVisibility(false);
+    return;
+  };
+
+  const handleCancelRecordingBtnClick = () => {
+    if (isRecording) {
+      cancelRecordingRef.current = true;
+      stopRecording();
+    }
+  
+    cancelPreview();
+    setRecordingCancelVisibility(false);
+    setSendBtnVisibility(false);
+    setMicStopVisibility(false);
+    setMicVisibility(true);
+    return;
+  };
+
+  useEffect(() => {
+    if (text.length > 0 || imageFiles.length > 0) {
+      setSendBtnVisibility(true);
+      setMicVisibility(false);
+    } else {
+      setSendBtnVisibility(false);
+      setMicVisibility(true);
+    }
+  }, [text, imageFiles]);
 
   const startRecording = async () => {
+    if (mediaRecorderRef.current?.state === "recording") return;
+
     const micStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
-    });    // ASKS BROWSER FOR MIC ACCESS
-    console.log("micStream: ",micStream);
-    setStream(micStream);    // SET THE STREAM
-    setIsRecording(true);    // TRIGGER WAVEFORM RENDERING
+    });
+    setStream(micStream);
+    setIsRecording(true);
 
-    mediaRecorderRef.current = new MediaRecorder(micStream);
+    mediaRecorderRef.current = new MediaRecorder(micStream, {
+      mimeType: "audio/webm",
+    });
+
     audioChunksRef.current = [];
-    mediaRecorderRef.current.start();    // START RECORDING
-    console.log("mediaRecorderRef: ",mediaRecorderRef.current);
+    mediaRecorderRef.current.start(1000);
 
-    mediaRecorderRef.current.ondataavailable = (e) =>    
-      audioChunksRef.current.push(e.data);
-      console.log("audioChunksRef.current", audioChunksRef.current)    // AUDIO COMES IN CHUNKS. WHEN RECORDING STOPS, WE GET ALL THE CHUNKS IN ONDATAAVAILABLE EVENT.
+    mediaRecorderRef.current.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunksRef.current.push(e.data);
+    };
   };
 
-  const stopRecording = async () => {
-    setIsRecording(false);    // STOP WAVEFORM RENDERING
-    stream.getTracks().forEach(track => track.stop());    // FREES MICROPHONE, PREVNETS "MIC STILL IN USE" BUG.
-    mediaRecorderRef.current.stop();    // FINALIZE AUDIO FILE
-    console.log(mediaRecorderRef)
-    // mediaRecorderRef.current.stop();
+  const stopRecording = () => {
+    if (!mediaRecorderRef.current) return;
 
-    // mediaRecorderRef.current.onstop = async () => {
-      // const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-      // const file = new File([blob], "voice.webm");
-      // setIsRecording(false);
-      // stream.getTracks().forEach((track) => track.stop());
-      // mediaRecorderRef.current.stop();
-      // console.log("Audio File: ", stream);
+    setIsRecording(false);
 
-      // const uploaded = await storageService.uploadFile(file);
+    mediaRecorderRef.current.onstop = async () => {
+      if (cancelRecordingRef.current) {
+        cancelRecordingRef.current = false;
+        audioChunksRef.current = [];
+        return;
+      }
+      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      const file = new File([blob], "voice.webm", { type: "audio/webm" });
 
-      // await databaseService.sendMessage({
-      //   chatId,
-      //   senderId: userId,
-      //   type: "voice",
-      //   content: uploaded.$id,
-      //   fileUrl: storageService.getFileView(uploaded.$id),
-      // });
-    // };
+      const waveform = await generateWaveform(blob);
+
+      
+        setPreviewFile(file);
+        setPreviewType("voice");
+        setPreviewWaveform(waveform);
+      
+
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    };
+
+    mediaRecorderRef.current.stop();
   };
+
+  const sendPreview = async () => {
+    const fileID = ID.unique();
+    const uploaded = await storageServices.uploadFile({
+      fileID,
+      file: previewFile,
+    });
+
+    await messagesService.sendMessage({
+      chatId,
+      senderId: userId,
+      type: previewType,
+      fileId: uploaded.$id,
+      fileUrl: storageServices.getFileView(uploaded.$id),
+      waveform: previewWaveform || null,
+    });
+
+    setPreviewFile(null);
+    setPreviewType(null);
+    setPreviewWaveform(null);
+  };
+
+  const cancelPreview = () => {
+    setPreviewFile(null);
+    setPreviewType(null);
+    setPreviewWaveform(null);
+  };
+
+  useEffect(() => {
+    if (!previewFile) return;
+  
+    const url = URL.createObjectURL(previewFile);
+    setPreviewUrl(url);
+  
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [previewFile]);
+  console.log("Preview File: ", previewFile);
 
   return (
     <div className={styles.chat_panel_container}>
       <div className={styles.chat_panel_header_container}>
         <div className={styles.chat_panel_header_container_1}>
-          <span className="material-symbols-outlined" onClick={() => setCurrentChat("")}>arrow_back</span>
+          <span
+            className="material-symbols-outlined"
+            onClick={() => setCurrentChat("")}
+          >
+            arrow_back
+          </span>
           <p>
             {currentChat?.$id
               ? currentChat.first_name + " " + currentChat.last_name
@@ -416,7 +515,12 @@ function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
             <span className={styles.input_image_panel}>
               {imageFiles.map((image) => (
                 <span key={image.fileID}>
-                  <span className="material-symbols-outlined" onClick={()=> handleRemoveFile(image.fileID)}>cancel</span>
+                  <span
+                    className="material-symbols-outlined"
+                    onClick={() => handleRemoveFile(image.fileID)}
+                  >
+                    cancel
+                  </span>
                   <img
                     src={image.fileUrl}
                     alt="Preview Not Available"
@@ -456,20 +560,58 @@ function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
-          {text == "" && imageFiles.length == 0 ? (
-            <>
-              {isRecording && (
-                <VoiceWaveform stream={stream} isRecording={isRecording} />
-              )}
-              <span
-                className="material-symbols-outlined"
-                onMouseDown={startRecording}
-                onMouseUp={stopRecording}
-              >
-                mic
-              </span>
-            </>
-          ) : (
+
+          {isRecording && (
+            <VoiceWaveform stream={stream} isRecording={isRecording} />
+          )}
+
+          {previewFile && (
+            <audio
+              controls
+              src={previewUrl}
+              style={{
+                border: "1px solid black",
+                height: "35px",
+                borderRadius: "20px",
+                padding: "0px 10px",
+                backgroundColor: "#f5f5f5",
+              }}
+            />
+          )}
+
+          {micVisibility && (
+            <span
+              className="material-symbols-outlined"
+              // onMouseDown={startRecording}
+              // onMouseUp={stopRecording}
+              onClick={handleMicBtnClick}
+            >
+              mic
+            </span>
+          )}
+          {micStopVisibility && (
+            <span
+              className="material-symbols-outlined"
+              // onMouseDown={startRecording}
+              // onMouseUp={stopRecording}
+              onClick={handleStopRecordingBtnClick}
+              style={{ color: "#c60e0e", fontWeight: "400" }}
+            >
+              stop
+            </span>
+          )}
+          {recordingCancelVisibility && (
+            <span
+              className="material-symbols-outlined"
+              // onMouseDown={startRecording}
+              // onMouseUp={stopRecording}
+              onClick={handleCancelRecordingBtnClick}
+              style={{ color: "#c60e0e", fontWeight: "400" }}
+            >
+              cancel
+            </span>
+          )}
+          {sendBtnVisibility && (
             <span className="material-symbols-outlined" onClick={sendMessage}>
               send
             </span>
@@ -479,5 +621,5 @@ function ChatPanel({ currentChat,setCurrentChat, userProfile }) {
     </div>
   );
 }
-// }
+
 export default ChatPanel;
