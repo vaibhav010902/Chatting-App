@@ -1,44 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./MessageTile.module.css";
 import { ID } from "appwrite";
+import FilePreview from "../FilePreview";
 
-function MessageTile({
-  msgId,
-  message,
-  messanger,
-  mediaUrl,
-  deleteMessage,
-  editMessage,
-  time,
-  ...props
-}) {
+function MessageTile({ msgId, message, messanger,type, mediaUrl, deleteMessage, editMessage, time, ...props}) {
   const [optionVisibility, setOptionVisibility] = useState(false);
-  const [editMessagePanelVisibility, setEditMessagePanelVisibility] =
-    useState(false);
+  const [editMessagePanelVisibility, setEditMessagePanelVisibility] = useState(false);
   const [editText, setEditText] = useState("");
+  const [msgType, setMsgType] = useState("text");
+
+  useEffect(()=>{
+    if(type == "voice"){
+      setMsgType("voice")
+    }else if(type == "image"){
+      setMsgType("image")
+    }else{
+      setMsgType("text")
+    }
+  },[msgId])
 
   return (
     <>
       <li
         className={styles.message_tile}
         style={{
-          borderRadius:
-            messanger == "sender" ? "0 10px 10px 10px" : "10px 0px 10px 10px",
+          borderRadius: messanger == "sender" ? "0 10px 10px 10px" : "10px 0px 10px 10px",
           alignSelf: messanger == "sender" ? "flex-start" : "flex-end",
+          zIndex: optionVisibility || editMessagePanelVisibility ? 2 : 1,
         }}
       >
-        {mediaUrl.length > 0 ? (
+        {msgType=="image" && (
           <span className={styles.image_container}>
             {mediaUrl.map((media) => (
               <img src={media + "&mode=admin"} alt="" key={ID.unique()} />
             ))}
           </span>
-        ) : null}
+        )}
+        {msgType=="voice" && (
+          <FilePreview mediaUrl={mediaUrl}/>
+        )}
         <div className={styles.message_container}>
           <p>{message}</p>
           <span
             className="material-symbols-outlined"
-            onClick={() => setOptionVisibility((prev) => !prev)}
+            onClick={() => {
+              setEditMessagePanelVisibility(false)
+              setOptionVisibility(prev => !prev)
+              return;
+            }}
           >
             {optionVisibility ? "keyboard_arrow_up" : "keyboard_arrow_down"}
           </span>
@@ -48,7 +57,7 @@ function MessageTile({
             <button
               onClick={() => {
                 setEditMessagePanelVisibility(true);
-                setOptionVisibility(false);
+                // setOptionVisibility(false);
                 return;
               }}
             >

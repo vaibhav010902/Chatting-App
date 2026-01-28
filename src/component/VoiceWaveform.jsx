@@ -24,8 +24,8 @@ export default function VoiceWaveform({stream, isRecording}){
             const barwidth = canvas.width/dataArray.length;    // THIS IS THE WIDTH OF EACH BAR. DIVIDE CANVAS INTO EQUAL BARS
 
             dataArray.forEach((value,i) => {
-                const barHeight = value/2;    // THIS IS THE HEIGHT OF EACH BAR. DIVIDE BY 2 TO MAKE IT SMALLER. LOUDER SOUND --> TALLER BAR
-                ctx.fillStyle = "#25D366";
+                const barHeight = value/2;      // THIS IS THE HEIGHT OF EACH BAR. DIVIDE BY 2 TO MAKE IT SMALLER. LOUDER SOUND --> TALLER BAR
+                ctx.fillStyle = "black";
                 ctx.fillRect(
                     i*barwidth,
                     canvas.height - barHeight,
@@ -43,5 +43,5 @@ export default function VoiceWaveform({stream, isRecording}){
         };
     },[stream, isRecording]);
 
-    return <canvas ref={canvasRef} width={200} height={40}/>
+    return <canvas ref={canvasRef} width={200} height={30}/>
 }

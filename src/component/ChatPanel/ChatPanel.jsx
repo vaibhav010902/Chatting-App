@@ -184,6 +184,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
     setMicStopVisibility(false);
     setRecordingCancelVisibility(false);
     setSendBtnVisibility(false);
+    handleCancelRecordingBtnClick();
     // FRIEND CHECK
     const isNotFriend = !userProfile.friends.some(
       (friend) => friend === currentChat?.$id
@@ -210,6 +211,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
 
     // UPLOAD MEDIA (WAIT HERE)
     let mediaFiles = [];
+    let msgType = null;
 
     if (imageFiles.length > 0) {
       try {
@@ -217,6 +219,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
           imageFiles.map(async ({ fileID, file, fileUrl }) => {
             const uploaded = await storageServices.uploadFile({ fileID, file });
             URL.revokeObjectURL(fileUrl);
+            msgType = "image";
             return uploaded; // just the URL string
           })
         );
@@ -226,12 +229,24 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
       }
     }
 
+    if (previewFile) {
+      const fileID = ID.unique();
+      let uploaded = await storageServices.uploadFile({
+        fileID,
+        file: previewFile,
+      });
+      uploaded = uploaded.replace("preview","view")
+      msgType = "voice";
+      mediaFiles.push(uploaded);
+      sendPreview()
+    }
+
     // CREATE MESSAGE (NOW mediaFiles IS READY ✅)
     const message = {
       id: ID.unique(),
       chatId: currentChat?.$id,
       senderId: userData.$id,
-      type: null,
+      type: msgType == "voice" ? "voice" : msgType == "image"? "image" : "text",
       content: text || "",
       mediaUrl: mediaFiles,
       createdAt: new Date().toISOString(),
@@ -250,6 +265,8 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
     // RESET UI
     setText("");
     setImageFiles([]);
+    msgType = "";
+
   };
 
   const getMessage = async () => {
@@ -337,6 +354,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
   const handleStopRecordingBtnClick = () => {
     stopRecording();
     setSendBtnVisibility(true);
+    setMicVisibility(false);
     setMicStopVisibility(false);
     return;
   };
@@ -346,7 +364,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
       cancelRecordingRef.current = true;
       stopRecording();
     }
-  
     cancelPreview();
     setRecordingCancelVisibility(false);
     setSendBtnVisibility(false);
@@ -402,11 +419,9 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
 
       const waveform = await generateWaveform(blob);
 
-      
-        setPreviewFile(file);
-        setPreviewType("voice");
-        setPreviewWaveform(waveform);
-      
+      setPreviewFile(file);
+      setPreviewType("voice");
+      setPreviewWaveform(waveform);
 
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
@@ -416,21 +431,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
   };
 
   const sendPreview = async () => {
-    const fileID = ID.unique();
-    const uploaded = await storageServices.uploadFile({
-      fileID,
-      file: previewFile,
-    });
-
-    await messagesService.sendMessage({
-      chatId,
-      senderId: userId,
-      type: previewType,
-      fileId: uploaded.$id,
-      fileUrl: storageServices.getFileView(uploaded.$id),
-      waveform: previewWaveform || null,
-    });
-
     setPreviewFile(null);
     setPreviewType(null);
     setPreviewWaveform(null);
@@ -444,15 +444,14 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
 
   useEffect(() => {
     if (!previewFile) return;
-  
+
     const url = URL.createObjectURL(previewFile);
     setPreviewUrl(url);
-  
+
     return () => {
       URL.revokeObjectURL(url);
     };
   }, [previewFile]);
-  console.log("Preview File: ", previewFile);
 
   return (
     <div className={styles.chat_panel_container}>
@@ -484,13 +483,14 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
               key={msg.$id}
               msgId={msg.$id}
               message={msg.content}
+              type={msg.type}
               mediaUrl={msg.mediaUrl}
               messanger={
                 msg.senderId == currentChat.$id ? "sender" : "receiver"
               }
               deleteMessage={deleteMessage}
               editMessage={editMessage}
-              time={msg.createdAt}
+              time={msg.createdAt.slice(11, 16)}
             />
           ))}
         </ul>
@@ -562,7 +562,11 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
           />
 
           {isRecording && (
-            <VoiceWaveform stream={stream} isRecording={isRecording} />
+            <VoiceWaveform
+              stream={stream}
+              isRecording={isRecording}
+              style={{ border: "1px solid black" }}
+            />
           )}
 
           {previewFile && (
@@ -582,8 +586,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
           {micVisibility && (
             <span
               className="material-symbols-outlined"
-              // onMouseDown={startRecording}
-              // onMouseUp={stopRecording}
               onClick={handleMicBtnClick}
             >
               mic
@@ -592,8 +594,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
           {micStopVisibility && (
             <span
               className="material-symbols-outlined"
-              // onMouseDown={startRecording}
-              // onMouseUp={stopRecording}
               onClick={handleStopRecordingBtnClick}
               style={{ color: "#c60e0e", fontWeight: "400" }}
             >
@@ -603,8 +603,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
           {recordingCancelVisibility && (
             <span
               className="material-symbols-outlined"
-              // onMouseDown={startRecording}
-              // onMouseUp={stopRecording}
               onClick={handleCancelRecordingBtnClick}
               style={{ color: "#c60e0e", fontWeight: "400" }}
             >
