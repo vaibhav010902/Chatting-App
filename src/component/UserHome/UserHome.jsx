@@ -3,6 +3,7 @@ import { ChatContact, ChatPanel, Loading, Sidebar } from "../index";
 import { useSelector } from "react-redux";
 import profileServices from "../../appwrite/profileServices";
 import messagesService from "../../appwrite/messagesService";
+import "./UserHome.css";
 import {
   ProfilePanel,
   ContactPanel,
@@ -48,7 +49,7 @@ function UserHome() {
     },
     {
       name: "Settings",
-      component: <SettingPanel userProfile={userProfile}/>,
+      component: <SettingPanel userProfile={userProfile} />,
       status: false,
     },
   ];
@@ -98,26 +99,39 @@ function UserHome() {
   }, [userData]);
   // console.log(friends);
   useEffect(() => {
-    if (Array.isArray(friends) && Array.isArray(users) && Array.isArray(userProfile)) {
+    if (
+      Array.isArray(friends) &&
+      Array.isArray(users) &&
+      Array.isArray(userProfile)
+    ) {
       console.log("Friends:", friends);
       setLoading(false);
-      console.log(loading)
+      console.log(loading);
     }
-  },[friends])
-
+  }, [friends]);
 
   return (
     <>
       {loading ? (
-        <Loading/>
-      ):(
+        <Loading />
+      ) : (
         <>
-          <Sidebar activePanel={activePanel} setActivePanel={setActivePanel} />
-          {activePanelComponent}
-          {currentChat?.$id && <ChatPanel currentChat={currentChat} setCurrentChat={setCurrentChat} userProfile={userProfile} />}
-          
+          <div className="userhome-page">
+            <Sidebar
+              activePanel={activePanel}
+              setActivePanel={setActivePanel}
+            />
+            {activePanelComponent}
+            {currentChat?.$id && (
+              <ChatPanel
+                currentChat={currentChat}
+                setCurrentChat={setCurrentChat}
+                userProfile={userProfile}
+              />
+            )}
+          </div>
         </>
-      ) }
+      )}
     </>
   );
 

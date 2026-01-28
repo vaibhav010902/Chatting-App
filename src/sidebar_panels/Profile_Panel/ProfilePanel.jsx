@@ -10,7 +10,7 @@ function ProfilePanel({ userProfile }) {
       name: userProfile?.first_name + " "  + userProfile?.last_name,
       email: userProfile?.email,
       phone: userProfile?.phone,
-      dob: userProfile?.dob,
+      dob: userProfile?.dob.slice(0,10),
       status: userProfile?.status,
     },
   });
@@ -87,7 +87,7 @@ function ProfilePanel({ userProfile }) {
             <div className={styles.field_container}>
               <label htmlFor="dob">DOB</label>
               {!edit ? (
-                <p>{userProfile?.dob}</p>
+                <p>{userProfile?.dob.slice(0,10)}</p>
               ) : (
                 <input
                   type="date"

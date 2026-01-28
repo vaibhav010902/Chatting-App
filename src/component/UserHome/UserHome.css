@@ -1,0 +1,18 @@
+.userhome-page{
+    margin-left: 50px;
+    width: calc(100% - 50px);
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: 330px 1fr;
+}
+@media (max-width: 768px) {
+    .userhome-page {
+      grid-template-columns: 1fr;
+    }
+  
+    .chatcontact {
+      display: none;
+    }
+  }
+  
