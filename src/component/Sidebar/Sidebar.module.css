@@ -37,7 +37,17 @@
     font-size: 30px;
     font-weight: 300;
 }
-
+/* .profile_container div span p{
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background-color: red;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+} */
 .btns_container {
     width: 100%;
     display: flex;
@@ -46,7 +56,33 @@
     gap: 13px;
 }
 
-.btns_container span {
+
+.btns_container div {
+    width: 100%;
+    /* padding: 8px 5px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 400;
+    transition: 0.7ms ease-in;
+    cursor: pointer; */
+    /* font-size: 23px; */
+    position: relative;
+}
+.btns_container div p{
+    border: none;
+    border-radius: 50%;
+    background-color: #ee2c2c;
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    padding: 1px 4px;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 2;
+}
+.btns_container div span {
     width: 100%;
     padding: 8px 5px;
     border-radius: 10px;
@@ -54,9 +90,10 @@
     font-weight: 400;
     transition: 0.7ms ease-in;
     cursor: pointer;
-    /* font-size: 23px; */
+    z-index: 1;
+    /* font-size: 23px;*/
 }
-.btns_container span:hover{
+.btns_container div span:hover{
     cursor: pointer;
     background-color: rgb(245,245,245);
     scale: 0.97;
@@ -69,7 +106,15 @@
     align-items: center;
     gap: 13px;
 }
-.navbar_container_2 span{
+.navbar_container_2 div{
+    width: 100%;
+    padding: 8px 5px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 400;
+    transition: 0.7ms ease-in;
+}
+.navbar_container_2 div span{
     width: 100%;
     padding: 8px 5px;
     border-radius: 10px;

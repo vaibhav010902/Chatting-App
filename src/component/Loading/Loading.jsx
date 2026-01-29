@@ -4,11 +4,11 @@ import './Loading.css'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 
-function Loading() {
+function Loading({font_Size = "30px"}) {
   return (
 
-    <div className="loading-page">
-      <div className="loading">LOADING....</div>
+    <div className="loading-page" >
+      <div className="loading" style={{fontSize: font_Size}}>LOADING....</div>
     </div>
   )
 }

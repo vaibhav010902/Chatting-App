@@ -24,7 +24,6 @@ function ChatContact({ friends, setCurrentChat }) {
         friend.last_name.toLowerCase().includes(text.toLowerCase())
     );
     setFilterUser(friends);
-    console.log(text);
   }, [text, friends]); // BUG FIXED BY ADDING FRIENDS ARRAY IN USEEFFECT DEPENDENCY ARRAY
 
   const handleProfileBtn = async () => {

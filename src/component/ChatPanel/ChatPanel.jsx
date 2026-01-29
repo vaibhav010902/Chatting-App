@@ -19,8 +19,9 @@ import Picker from "@emoji-mart/react";
 import storageServices from "../../appwrite/storage";
 import VoiceWaveform from "../VoiceWaveform";
 import { generateWaveform } from "../utils/generateWaveform";
+import relationshipServices from "../../appwrite/relationshipServices";
 
-function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
+function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userProfile }) {
   const [emojiVisibility, setEmojiVisibility] = useState(false);
   const fileRef = useRef();
   const [text, setText] = useState("");
@@ -39,8 +40,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
   const userData = useSelector((state) => state.auth.userData);
   const [micVisibility, setMicVisibility] = useState(true);
   const [micStopVisibility, setMicStopVisibility] = useState(false);
-  const [recordingCancelVisibility, setRecordingCancelVisibility] =
-    useState(false);
+  const [recordingCancelVisibility, setRecordingCancelVisibility] =useState(false);
   const [sendBtnVisibility, setSendBtnVisibility] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -194,16 +194,13 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
       try {
         await profileServices.updateProfile({
           userId: userProfile.$id,
-          first_name: userProfile.first_name,
-          last_name: userProfile.last_name,
-          email: userProfile.email,
-          phone: userProfile.phone,
-          dob: userProfile.dob,
-          status: userProfile.status,
-          profile: userProfile.profile_image,
-          friends: [...userProfile.friends, currentChat?.$id],
-          $createdAt: userProfile.$createdAt,
+          friends: [...new Set([...userProfile.friends, currentChat.$id])]
         });
+        await relationshipServices.friendRequest({
+          relationshipId: ID.unique()+Date.toISOString,
+          fromUserId: userProfile.$id,
+          toUserId: currentChat.$id,
+        })
       } catch (error) {
         console.error("Failed to update friends", error);
       }
@@ -337,9 +334,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile }) {
     }
     const updatedFiles = imageFiles.filter((file) => file.fileID !== fileID);
     setImageFiles(updatedFiles);
-    // setImageFiles((prev) =>
-    //   prev.filter((file) => file.fileID !== fileID)
-    // );
   };
 
   const handleMicBtnClick = () => {
