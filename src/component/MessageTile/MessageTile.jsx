@@ -32,7 +32,7 @@ function MessageTile({ msgId, message, messanger,type, mediaUrl, deleteMessage, 
         {msgType=="image" && (
           <span className={styles.image_container}>
             {mediaUrl.map((media) => (
-              <img src={media + "&mode=admin"} alt="" key={ID.unique()} />
+              <img src={media.replace("preview","view") + "&mode=admin"} alt="" key={ID.unique()} />
             ))}
           </span>
         )}

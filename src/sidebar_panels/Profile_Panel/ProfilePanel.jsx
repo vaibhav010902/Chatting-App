@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import styles from "./ProfilePanel.module.css";
 import { Button, ContactTile } from "../../component";
 import { useForm } from "react-hook-form";
+import profileServices from "../../appwrite/profileServices";
 
-function ProfilePanel({ userProfile }) {
+function ProfilePanel({ userProfile, setUserProfile }) {
   const [edit, setEdit] = useState(false);
   const { register, handleSubmit } = useForm({
     defaultValues: {
@@ -15,9 +16,20 @@ function ProfilePanel({ userProfile }) {
     },
   });
 
-  const editSubmit = () => {
+  const editSubmit = async (data) => {
     setEdit(prev => !prev);
-
+    console.log(data);
+    
+    const response = await profileServices.updateProfile({
+      userId: userProfile.$id,
+      first_name: data.name.split(" ")[0],
+      last_name: data.name.split(" ")[1]+" "+data.name.split(" ")[2],
+      email: data.email,
+      phone: data.phone,
+      dob: data.dob,
+      status: data.status,
+    })
+    setUserProfile(response);
   };
 
   return (
@@ -28,7 +40,7 @@ function ProfilePanel({ userProfile }) {
             <h1>Chat App</h1>
           </div>
           <div className={styles.profile_panel_img_container}>
-            <img src={userProfile.profile_image} alt="" className={styles.user_profile_image} />
+            <img src={userProfile?.profile_image} alt="" className={styles.user_profile_image} />
           </div>
           <form
             className={styles.profile_panel_fields_container}
@@ -109,9 +121,9 @@ function ProfilePanel({ userProfile }) {
               )}
             </div>
             {!edit ? (
-              <button type="button" onClick={() => setEdit(prev => !prev)}>
+              <span className={styles.edit_btn} onClick={() => setEdit(prev => !prev)}>
                 Edit
-              </button>
+              </span>
             ) : (
               <button type="submit">Save</button>
             )}

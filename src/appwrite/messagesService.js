@@ -44,17 +44,8 @@ export class MessagesService{
                 conf.appwriteMessagesCollectionID,
                 [
                     Query.orderAsc("createdAt"),
-                    // Query.or([
-                    //     Query.and([
-                    //         Query.equal("chatId", chatId),
-                    //         Query.equal("senderId", userId)
-                    //     ]),
-                    //     Query.and([
-                    //         Query.equal("chatId", userId),
-                    //         Query.equal("senderId", chatId)
-                    //     ])
-                    // ])
-                    Query.equal("conversationId", conversationId)
+                    Query.equal("conversationId", conversationId),
+                    Query.limit(100)
                     // Query.equal("chatId", chatId),
                     // Query.equal("senderId",userId)
                 ]
@@ -110,6 +101,7 @@ export class MessagesService{
                     Query.equal("status", status)
                 ]
             )
+            // console.log("Appwrite Messages Service :: getMessageStatus :: response: ", response.documents);
             return response.documents;
         } catch (error) {
             console.log("Appwrite Messages Service :: getMessageStatus :: error: ", error);
@@ -128,6 +120,24 @@ export class MessagesService{
             )
         }catch(error){
             console.log("Appwrite Messages Service :: updateMessageStatus :: error: ", error);
+        }
+    }
+
+    async getMessagesSendByUser({activeChatId, userId}){
+        try {
+            const response = await this.databases.listDocuments(
+                conf.appwriteDatabaseID,
+                conf.appwriteMessagesCollectionID,
+                [
+                    Query.equal("chatId", userId),
+                    Query.equal("senderId", activeChatId),
+                    Query.notEqual("status", "seen")
+                ]
+            )
+            // console.log("Appwrite Messages Service :: getMessagesSendByUser :: response: ", response.documents);
+            return response.documents;
+        } catch (error) {
+            console.log("Appwrite Messages Service :: getMessagesSendByUser :: error: ", error);
         }
     }
 }

@@ -8,7 +8,7 @@ function Navbar({ homeBtn }) {
   return (
     <nav className={styles.navbar_container}>
       <div className={styles.navbar_title_container}>
-        <h1>Chat App</h1>
+        <h1>Friend-Circle</h1>
       </div>
       <div className={styles.navbar_btn_container}>
         {homeBtn ? (

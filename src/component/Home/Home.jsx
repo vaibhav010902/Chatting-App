@@ -11,8 +11,8 @@ function Home() {
       <div className={styles.home}>
         <Navbar homeBtn={false}/>
         <div className={styles.home_container}>
-          <h1>CHATING</h1>
-          <h1>APP</h1>
+          <h1>FRIENDS</h1>
+          <h1>CIRCLE</h1>
           {/* <Login/> */}
         </div>
       </div>

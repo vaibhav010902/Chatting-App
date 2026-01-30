@@ -2,12 +2,13 @@ import React from "react";
 import styles from "./Sidebar.module.css";
 import authServices from "../../appwrite/auth";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout as authLogout } from "../../store/authSlice";
 
 function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const unreadMsg = useSelector((state) => state.messageStatus.totalUnread);
   return (
     <>
       <nav className={styles.navbar}>
@@ -31,7 +32,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
             </div>
             <div className={styles.btns_container}>
               <div>
-              {newMessages > 0 && <p>{newMessages}</p>}
+              {unreadMsg > 0 && <p>{unreadMsg}</p>}
                 <span
                   className="material-symbols-outlined"
                   onClick={() => setActivePanel("Friends")}
@@ -88,7 +89,6 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
             </div>
           </div>
           <div className={styles.navbar_container_2}>
-            <div>
               <span
                 className="material-symbols-outlined"
                 onClick={() => setActivePanel("Settings")}
@@ -100,8 +100,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
               >
                 settings
               </span>
-            </div>
-            <div>
+            
               <span
                 className="material-symbols-outlined"
                 onClick={async () => {
@@ -116,7 +115,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
               >
                 logout
               </span>
-            </div>
+            
           </div>
         </div>
       </nav>

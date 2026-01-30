@@ -3,11 +3,7 @@ import styles from "./ChatPanel.module.css";
 import MessageTile from "../MessageTile/MessageTile";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setActiveChat,
-  loadLocalMessages,
-  addMessage,
-} from "../../store/chatSlice";
+import {setActiveChat, loadLocalMessages, addMessage} from "../../store/chatSlice";
 import messagesService from "../../appwrite/messagesService";
 import { ID } from "appwrite";
 import conf from "../../conf/conf";
@@ -20,8 +16,9 @@ import storageServices from "../../appwrite/storage";
 import VoiceWaveform from "../VoiceWaveform";
 import { generateWaveform } from "../utils/generateWaveform";
 import relationshipServices from "../../appwrite/relationshipServices";
+import { resetUnreadByUser } from "../../store/messageStatusSlice";
 
-function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
+function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
   const [emojiVisibility, setEmojiVisibility] = useState(false);
   const fileRef = useRef();
   const [text, setText] = useState("");
@@ -40,11 +37,11 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
   const userData = useSelector((state) => state.auth.userData);
   const [micVisibility, setMicVisibility] = useState(true);
   const [micStopVisibility, setMicStopVisibility] = useState(false);
-  const [recordingCancelVisibility, setRecordingCancelVisibility] =
-    useState(false);
+  const [recordingCancelVisibility, setRecordingCancelVisibility] = useState(false);
   const [sendBtnVisibility, setSendBtnVisibility] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const chatRef = useRef(null);
+  const dispatch = useDispatch();
 
   // const dispatch = useDispatch();
   // const messages = useSelector((state) => state.chat.messages);
@@ -69,118 +66,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
     return [userData.$id, currentChat?.$id].sort().join("-");
   };
 
-  // const sendMessage = async () => {
-  //   const isNotFriend = !userProfile.friends.some(
-  //     (friend) => friend == currentChat?.$id
-  //   );
-  //   // CHECK IF THE CURRENT CHAT IS FRIEND OF CURRENT USER ON NOT
-  //   if (isNotFriend) {
-  //     const updatedFriends = [...userProfile.friends, currentChat?.$id];
-  //     // PUSH CURRENT CHAT INTO THE FRIENDS ARRAY
-  //     try {
-  //       await profileServices.updateProfile({
-  //         userId: userProfile.$id,
-  //         first_name: userProfile.first_name,
-  //         last_name: userProfile.last_name,
-  //         email: userProfile.email,
-  //         phone: userProfile.phone,
-  //         dob: userProfile.dob,
-  //         status: userProfile.status,
-  //         profile: userProfile.profile_image,
-  //         friends: updatedFriends,
-  //         $createdAt: userProfile.$createdAt,
-  //       });
-  //     } catch (error) {
-  //       console.error("Failed to update friends", error);
-  //     }
-  //   }
-  //   // IF NOT -> UPDATE THE FIRENDS ARRAY OF CURRENT USER
-  //   // const [mediaFiles,setMediaFiles] = useState([]);
-
-  //   // if (imageFiles.length > 0) {
-  //   //   const uploadAll = async () => {
-  //   //     const uploads = imageFiles.map(({ fileID, file }) => ({
-  //   //       id: fileID,
-  //   //       media: storageServices.uploadFile({ fileID, file }),
-  //   //     }));
-
-  //   //     // const mediaUrl = await Promise.all({ uploads });
-  //   //     const mediaUrl = await Promise.all(
-  //   //       uploads.map(({ id, media }) =>
-  //   //         media.then((res) => ({
-  //   //           id,
-  //   //           mediaUrl: media,
-  //   //         }))
-  //   //       )
-  //   //     );
-  //   //     console.log("Uploaded files:", mediaUrl);
-  //   //     return;
-  //   //   };
-  //   //   uploadAll();
-  //   // }
-  //   let mediaFiles = [];
-  //   if (imageFiles.length > 0) {
-  //     const uploadAll = async () => {
-  //       try {
-  //         const mediaFiles = await Promise.all(
-  //           imageFiles.map(async ({ fileID, file }) => {
-  //             const uploaded = await storageServices.uploadFile({ fileID, file });
-  //             console.log("Uploaded file:", uploaded);
-  //             return {
-  //               id: fileID,
-  //               mediaUrl: uploaded,
-  //             };
-  //           })
-  //         );
-  //         console.log("Uploaded files:", mediaFiles);
-  //         return;
-  //       } catch (error) {
-  //         console.error("Upload failed:", error);
-  //       }
-  //     };
-
-  //     uploadAll();
-  //     // return;
-  //   }
-
-  //   const message = {
-  //     id: ID.unique(),
-  //     chatId: currentChat?.$id,
-  //     senderId: userData.$id,
-  //     type: null,
-  //     content: text == "" ? "" : text,
-  //     mediaUrl: mediaFiles,
-  //     createdAt: new Date().toISOString(),
-  //     edited: false,
-  //     deleted: false,
-  //     conversationId: getConversationId(),
-  //   };
-
-  //   try {
-  //     const response = await messagesService.sendMessage(message);
-  //     if (!response) {
-  //       console.log("Message Not Sent");
-  //       return;
-  //     }
-  //   } catch (error) {
-  //     console.log("Something went wrong! Unable to send your message");
-  //   }
-
-  //   setText("");
-  // };
-
-  // const getUser = async () =>{
-  //   try {
-  //     const session = await profileServices.getProfile("696a8a29000d0d95163a");
-  //     if(session){
-  //       console.log("User Found: ", session);
-  //     }else{
-  //       console.log("User Not Found");
-  //     }
-  //   } catch (error) {
-  //     console.log("Something went wrong: ", error);
-  //   }
-  // }
   const sendMessage = async () => {
     setMicVisibility(true);
     setMicStopVisibility(false);
@@ -201,7 +86,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
         fromUserId: currentChat.$id,
         toUserId: userData.$id,
       });
-      // console.log("Relationship: ", response, isNotFriend);
+
       if (requestByUser.length == 0 && requestByOther.length == 0) {
         console.log("New Contact");
         await profileServices.updateProfile({
@@ -284,33 +169,11 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
 
   const getMessage = async () => {
     try {
-      // const userId = userData.$id;
       const response = await messagesService.getMessages(getConversationId());
+      console.log("Messages: ", response);
       setMessages(response.documents);
     } catch (error) {
       setMessages([]);
-      console.log("Something went wrong: ", error);
-    }
-  };
-
-  const updateMessageStatus = () => {
-    let messageIDs = unseenMsg
-      .filter(
-        (msg) => msg.senderId === currentChat.$id && msg.status === "delivered"
-      )
-      .map((msg) => msg.$id);
-    console.log("Message IDs: ", messageIDs);
-    try {
-      if (messageIDs.length == 0) return;
-      messageIDs.forEach(
-        async (msgId) =>
-          await messagesService.updateMessageStatus({
-            msgId: msgId,
-            status: "seen",
-          })
-      );
-      console.log("Message Update Successfully!");
-    } catch (error) {
       console.log("Something went wrong: ", error);
     }
   };
@@ -332,14 +195,31 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
   useEffect(() => {
     if (!currentChat?.$id) return;
     getMessage();
-    updateMessageStatus();
   }, [currentChat?.$id]);
 
   useEffect(() => {
+    if (!currentChat.$id) return;
+
+    const markSeen = async () => {
+      const response = await messagesService.getMessagesSendByUser({
+        activeChatId: currentChat.$id, 
+        userId: userProfile.$id
+      })
+      response.forEach(async (msg) => {
+        await messagesService.updateMessageStatus({
+          msgId: msg.$id,
+          status: "seen"
+        })
+      })
+      dispatch(resetUnreadByUser(currentChat.$id));
+    };
+    markSeen();
+  }, [messages, currentChat.$id]);
+
+
+  useEffect(() => {
     if (!currentChat?.$id) return;
-
     const channel = `databases.${conf.appwriteDatabaseID}.collections.${conf.appwriteMessagesCollectionID}.documents`;
-
     const unsubscribe = client.subscribe(channel, (response) => {
       if (
         response.events.includes("databases.*.collections.*.documents.*.create")
@@ -347,7 +227,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
         setMessages((prev) => [...prev, response.payload]);
       }
     });
-
     return () => {
       unsubscribe(); // ✅ always a function
     };
@@ -362,6 +241,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
       file,
       fileUrl: URL.createObjectURL(file),
     }));
+    console.log(mappedFiles[0].fileUrl)
     setImageFiles((prev) => [...prev, ...mappedFiles]);
 
     e.target.value = null; // FIX THE BUG (WHEN TRYING TO UPLOAD SAME NO. OF FILES RIGHT AFTER REMOVING THE PREVIOUS IMAGES FROM INPUT PREVIEW PANEL, IT DOESN'T GET UPLOADED...)
@@ -477,10 +357,8 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
 
   useEffect(() => {
     if (!previewFile) return;
-
     const url = URL.createObjectURL(previewFile);
     setPreviewUrl(url);
-
     return () => {
       URL.revokeObjectURL(url);
     };
@@ -491,7 +369,6 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [messages]);
-  
 
   return (
     <div className={styles.chat_panel_container}>

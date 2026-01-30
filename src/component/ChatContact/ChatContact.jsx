@@ -5,9 +5,11 @@ import Sidebar from "../Sidebar/Sidebar";
 import ChatPanel from "../ChatPanel/ChatPanel";
 import Loading from "../Loading/Loading";
 import authServices from "../../appwrite/auth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
+import messagesService from "../../appwrite/messagesService";
+import { resetUnreadByUser } from "../../store/messageStatusSlice";
 
 function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   const [text, setText] = useState("");
@@ -15,6 +17,7 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const msgUnreadByUser = useSelector(state => state.messageStatus.unreadByUser);
   // console.log(friends,filterUser);    // THIS HELPS ME TO IDENTIFY THE BUG
 
   useEffect(() => {
@@ -55,6 +58,21 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
       console.log("error: ",error);
     }
   }
+
+  const openChat = async (friendId) => {
+    // console.log("Hello guyz, mein OPENCHAT from ChatContact.jsx")
+    dispatch(resetUnreadByUser(friendId));
+  
+    unseenMsg.map(async (msg) => {
+      if(String(msg.senderId) === String(friendId)){
+        await messagesService.updateMessageStatus({
+          msgId: msg.$id,
+          status: "seen"
+        })
+      }
+    }
+    )
+  };
   return (
     <>
       <div className={styles.chatcontact}>
@@ -102,9 +120,13 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
                   contact_name={friend.first_name + " " + friend.last_name}
                   contact_msg={friend.status}
                   profile_image={friend.profile_image}
-                  // status={newMessages.includes(friend.$id)}
-                  status={unseenMsg.find(msg => String(msg.senderId) === String(friend.$id))}
-                  onClick={() => setCurrentChat(friend)}
+                  // status={unseenMsg.find(msg => String(msg.senderId) === String(friend.$id))}
+                  status={msgUnreadByUser[friend.$id]}
+                  onClick={() => {
+                    setCurrentChat(friend)
+                    openChat(friend.$id)
+                    return;
+                  }}
                 />
               ))
             )}

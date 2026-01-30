@@ -10,28 +10,28 @@ import RequestPanel from "../../sidebar_panels/Request_Panel/RequestPanel";
 import relationshipServices from "../../appwrite/relationshipServices";
 import { client } from "../../appwrite/config";
 import conf from "../../conf/conf";
+import {useDispatch} from "react-redux";
+import { setUnreadByUser } from "../../store/messageStatusSlice.js";
 
 function UserHome() {
   const userData = useSelector((state) => state.auth.userData);
 
   const [userProfile, setUserProfile] = useState({});
-  const [messages, setMessages] = useState([]);
-  const [contact, setContact] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentChat, setCurrentChat] = useState("");
-  const [currentChatUserProfile, setCurrentChatUserProfile] = useState({});
   const [activePanel, setActivePanel] = useState("Friends");
   const [users, setUsers] = useState([]);
   const [friends, setFriends] = useState(null);
   const [requestList, setRequestList] = useState([]);
   const [newMessages, setNewMessages] = useState([]);
   const [unseenMsg, setUnseenMsg] = useState([]);
+  const dispatch = useDispatch();
 
 
   const panels = [
     {
       name: "Profile",
-      component: <ProfilePanel userProfile={userProfile} />,
+      component: <ProfilePanel userProfile={userProfile} setUserProfile={setUserProfile}/>,
       status: false,
     },
     {
@@ -67,27 +67,37 @@ function UserHome() {
     (panel) => panel.name === activePanel
   )?.component;
 
-  const getUserProfile = async () => {
-    if (!userData?.$id) return;
-    try {
-      const response = await profileServices.getProfile(userData.$id);
-      setUserProfile(response.documents[0]);
-    } catch (error) {
-      console.log("Error fetching profile:", error.message);
-      setUserProfile(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const getUserProfile = async () => {
+      if (!userData?.$id) return;
+      try {
+        const response = await profileServices.getProfile(userData.$id);
+        setUserProfile(response.documents[0]);
+      } catch (error) {
+        console.log("Error fetching profile:", error.message);
+        setUserProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getUserProfile();
+  }, [userData]);
 
-  const getUsers = async () => {
-    try {
-      const response = await profileServices.getAllUsers();
-      setUsers(response?.documents || []);
-    } catch (error) {
-      console.log("Something went wrong while getting the users");
-    }
-  };
+  useEffect(() => {
+    const getMessageStatus = async () => {
+      if (!userProfile?.$id) return;
+      try {
+        const response = await messagesService.getMessagesStatus({recieverId: userProfile?.$id, status: "delivered"});
+        response.forEach(msg => {
+          dispatch(setUnreadByUser(msg.senderId));
+        })
+        setUnseenMsg(response);
+      } catch (error) {
+        console.log("Something went wrong while getting the messages");
+      }
+    };
+    getMessageStatus();
+  },[userProfile?.$id])
 
   const getFriendRequestList = async () => {
     if(!userProfile?.$id) return;
@@ -99,69 +109,30 @@ function UserHome() {
       console.log("UserHome :: getFriendRequestList :: ", error.message);
     }
   }
-
-  const getMessageStatus = async () => {
-    if (!userProfile?.$id) return;
-    try {
-      const response = await messagesService.getMessagesStatus({recieverId: userProfile?.$id, status: "delivered"});
-      setUnseenMsg(response);
-    } catch (error) {
-      console.log("Something went wrong while getting the messages");
-    }
-  };
-  // useEffect(() => {
-  //   const fetchNewMessages = async () => {
-  //     if (!friends?.length) {
-  //       setNewMessages([]);
-  //       return;
-  //     }
-  
-  //     const deliveredSenders = await getMessageStatus();
-  //     if (!deliveredSenders?.size) {
-  //       setNewMessages([]);
-  //       return;
-  //     }
-  
-  //     let newMsgFriends = friends.filter(friend =>
-  //       deliveredSenders.has(friend.$id)
-  //     );
-  //     newMsgFriends = newMsgFriends.map(friend => friend.$id)
-  
-  //     setNewMessages(newMsgFriends);
-  //   };
-  
-  //   fetchNewMessages();
-  // }, [friends]);
-  
-  useEffect(() => {
-    getMessageStatus();
-  },[currentChat])
-
   useEffect(() => {
     getFriendRequestList();
   }, [userProfile?.$id]);
 
   useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const response = await profileServices.getAllUsers();
+        setUsers(response?.documents || []);
+      } catch (error) {
+        console.log("Something went wrong while getting the users");
+      }
+    };
     getUsers();
-  }, []);
+  }, [userProfile?.$id]);
 
   useEffect(() => {
-    if (!users.length || !userProfile.friends?.length) return setFriends([]);
+    if (!users?.length || !userProfile?.friends?.length) return setFriends([]);
     const filteredFriends = users.filter((user) =>
       userProfile.friends.includes(user.$id)
     );
     setFriends(filteredFriends);
-    unseenMsg.length && setNewMessages(filteredFriends.map(friend => 
-      unseenMsg.find(msg => String(msg.senderId) === String(friend.$id))
-    ))
   }, [users, userProfile]);
-
-  useEffect(() => {
-    getUserProfile();
-  }, [userData]);
-
-
-
+  
   useEffect(() => {
     if (
       Array.isArray(friends) &&
@@ -173,18 +144,21 @@ function UserHome() {
   }, [friends]);
   
   useEffect(() => {
-    if (!currentChat?.$id) return;
-
+    if (!userProfile?.$id) return;
     const channel = `databases.${conf.appwriteDatabaseID}.collections.${conf.appwriteMessagesCollectionID}.documents`;
-
     const unsubscribe = client.subscribe(channel, (response) => {
       if (
         response.events.includes("databases.*.collections.*.documents.*.create")
       ) {
-        // setMessages((prev) => [...prev, response.payload]);
-        getMessageStatus();
+        if (!response.payload?.$id) return;
+        const msg = response.payload;
+        if (
+          msg.chatId === userProfile.$id &&
+          msg.status !== "seen"
+        ) {
+          dispatch(setUnreadByUser(msg.senderId));
+        }
         getFriendRequestList();
-        getUsers();
         console.log("Websocket!")
       }
     });
@@ -192,7 +166,7 @@ function UserHome() {
     return () => {
       unsubscribe(); // ✅ always a function
     };
-  }, [currentChat?.$id]);
+  }, [currentChat?.$id, userProfile?.$id]);
 
   return (
     <>
@@ -221,15 +195,6 @@ function UserHome() {
       )}
     </>
   );
-
-  // return (
-
-  //   // <>
-  //   //   <Sidebar activePanel={activePanel} setActivePanel={setActivePanel}/>
-  //   //   {activePanelComponent}
-  //   //   <ChatPanel currentChat={currentChat} userProfile={userProfile}/>
-  //   // </>
-  // );
 }
 
 export default UserHome;

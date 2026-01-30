@@ -106,15 +106,7 @@
     align-items: center;
     gap: 13px;
 }
-.navbar_container_2 div{
-    width: 100%;
-    padding: 8px 5px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: 400;
-    transition: 0.7ms ease-in;
-}
-.navbar_container_2 div span{
+.navbar_container_2 span{
     width: 100%;
     padding: 8px 5px;
     border-radius: 10px;

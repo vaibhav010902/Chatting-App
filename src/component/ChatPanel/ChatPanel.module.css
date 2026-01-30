@@ -73,12 +73,12 @@
     scroll-behavior: smooth;
     scrollbar-width: thin;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
 }
 .chats{
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
     list-style: none;
     gap: 10px;
     width: 100%;
