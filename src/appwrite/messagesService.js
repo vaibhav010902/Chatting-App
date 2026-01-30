@@ -27,7 +27,8 @@ export class MessagesService{
                     createdAt,
                     edited,
                     deleted,
-                    conversationId
+                    conversationId,
+                    status: "delivered"
                 }
             )
         } catch (error) {
@@ -96,6 +97,37 @@ export class MessagesService{
         } catch (error) {
             console.log("Appwrite Messages Service :: editMessage :: error: ", error);
             throw error;
+        }
+    }
+
+    async getMessagesStatus({recieverId, status }){
+        try {
+            const response = await this.databases.listDocuments(
+                conf.appwriteDatabaseID,
+                conf.appwriteMessagesCollectionID,
+                [
+                    Query.equal("chatId", recieverId),
+                    Query.equal("status", status)
+                ]
+            )
+            return response.documents;
+        } catch (error) {
+            console.log("Appwrite Messages Service :: getMessageStatus :: error: ", error);
+        }
+    }
+
+    async updateMessageStatus({msgId,status}){
+        try {
+            await this.databases.updateDocument(
+                conf.appwriteDatabaseID,
+                conf.appwriteMessagesCollectionID,
+                msgId,
+                {
+                    status: status
+                }
+            )
+        }catch(error){
+            console.log("Appwrite Messages Service :: updateMessageStatus :: error: ", error);
         }
     }
 }

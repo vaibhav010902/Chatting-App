@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout as authLogout } from "../../store/authSlice";
 
-function Sidebar({ activePanel, setActivePanel, requestList }) {
+function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   return (
@@ -31,6 +31,7 @@ function Sidebar({ activePanel, setActivePanel, requestList }) {
             </div>
             <div className={styles.btns_container}>
               <div>
+              {newMessages > 0 && <p>{newMessages}</p>}
                 <span
                   className="material-symbols-outlined"
                   onClick={() => setActivePanel("Friends")}

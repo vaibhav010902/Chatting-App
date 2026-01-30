@@ -8,6 +8,8 @@ import { ProfilePanel, ContactPanel, GroupPanel, SettingPanel } from "../../side
 import { Query } from "appwrite";
 import RequestPanel from "../../sidebar_panels/Request_Panel/RequestPanel";
 import relationshipServices from "../../appwrite/relationshipServices";
+import { client } from "../../appwrite/config";
+import conf from "../../conf/conf";
 
 function UserHome() {
   const userData = useSelector((state) => state.auth.userData);
@@ -22,6 +24,9 @@ function UserHome() {
   const [users, setUsers] = useState([]);
   const [friends, setFriends] = useState(null);
   const [requestList, setRequestList] = useState([]);
+  const [newMessages, setNewMessages] = useState([]);
+  const [unseenMsg, setUnseenMsg] = useState([]);
+
 
   const panels = [
     {
@@ -32,7 +37,7 @@ function UserHome() {
     {
       name: "Friends",
       component: (
-        <ChatContact friends={friends} setCurrentChat={setCurrentChat} />
+        <ChatContact friends={friends} setCurrentChat={setCurrentChat} unseenMsg={unseenMsg}/>
       ),
       status: true,
     },
@@ -75,17 +80,6 @@ function UserHome() {
     }
   };
 
-  const getCurrentChatUserProfile = async () => {
-    if (!currentChat?.$id) return;
-    try{
-      const response = await profileServices.getProfile(currentChat.$id);
-      setCurrentChatUserProfile(response.documents[0]);
-    }catch(error){
-      console.log("Error fetching profile:", error.message);
-      setCurrentChatUserProfile(null);
-    }finally{
-      setLoading(false);}
-  }
   const getUsers = async () => {
     try {
       const response = await profileServices.getAllUsers();
@@ -106,6 +100,43 @@ function UserHome() {
     }
   }
 
+  const getMessageStatus = async () => {
+    if (!userProfile?.$id) return;
+    try {
+      const response = await messagesService.getMessagesStatus({recieverId: userProfile?.$id, status: "delivered"});
+      setUnseenMsg(response);
+    } catch (error) {
+      console.log("Something went wrong while getting the messages");
+    }
+  };
+  // useEffect(() => {
+  //   const fetchNewMessages = async () => {
+  //     if (!friends?.length) {
+  //       setNewMessages([]);
+  //       return;
+  //     }
+  
+  //     const deliveredSenders = await getMessageStatus();
+  //     if (!deliveredSenders?.size) {
+  //       setNewMessages([]);
+  //       return;
+  //     }
+  
+  //     let newMsgFriends = friends.filter(friend =>
+  //       deliveredSenders.has(friend.$id)
+  //     );
+  //     newMsgFriends = newMsgFriends.map(friend => friend.$id)
+  
+  //     setNewMessages(newMsgFriends);
+  //   };
+  
+  //   fetchNewMessages();
+  // }, [friends]);
+  
+  useEffect(() => {
+    getMessageStatus();
+  },[currentChat])
+
   useEffect(() => {
     getFriendRequestList();
   }, [userProfile?.$id]);
@@ -120,16 +151,16 @@ function UserHome() {
       userProfile.friends.includes(user.$id)
     );
     setFriends(filteredFriends);
+    unseenMsg.length && setNewMessages(filteredFriends.map(friend => 
+      unseenMsg.find(msg => String(msg.senderId) === String(friend.$id))
+    ))
   }, [users, userProfile]);
 
   useEffect(() => {
     getUserProfile();
   }, [userData]);
 
-  useEffect(() => {
-    if (!currentChat) return;
-    getCurrentChatUserProfile(currentChat);
-  }, [currentChat]);
+
 
   useEffect(() => {
     if (
@@ -140,6 +171,28 @@ function UserHome() {
       setLoading(false);
     }
   }, [friends]);
+  
+  useEffect(() => {
+    if (!currentChat?.$id) return;
+
+    const channel = `databases.${conf.appwriteDatabaseID}.collections.${conf.appwriteMessagesCollectionID}.documents`;
+
+    const unsubscribe = client.subscribe(channel, (response) => {
+      if (
+        response.events.includes("databases.*.collections.*.documents.*.create")
+      ) {
+        // setMessages((prev) => [...prev, response.payload]);
+        getMessageStatus();
+        getFriendRequestList();
+        getUsers();
+        console.log("Websocket!")
+      }
+    });
+
+    return () => {
+      unsubscribe(); // ✅ always a function
+    };
+  }, [currentChat?.$id]);
 
   return (
     <>
@@ -152,14 +205,15 @@ function UserHome() {
               activePanel={activePanel}
               setActivePanel={setActivePanel}
               requestList={requestList}
+              newMessages={newMessages.length}
             />
             {activePanelComponent}
             {currentChat?.$id && (
               <ChatPanel
                 currentChat={currentChat}
-                currentChatUserProfile={currentChatUserProfile}
                 setCurrentChat={setCurrentChat}
                 userProfile={userProfile}
+                unseenMsg={unseenMsg}
               />
             )}
           </div>

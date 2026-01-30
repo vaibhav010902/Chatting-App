@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './ContactTile.module.css'
 
-function ContactTile({ contact_name, contact_msg , profile_image,...props}) {
+function ContactTile({ contact_name, contact_msg , profile_image,status,...props}) {
     return (
         <div className={styles.contact_tile_container} {...props}>
             <div className={styles.contact_tile_main_container}>
@@ -21,6 +21,7 @@ function ContactTile({ contact_name, contact_msg , profile_image,...props}) {
                     </div>
                 </div>
                 <div className={styles.contact_tile_btn_container}>
+                    {status && <p></p>}
                     <span className="material-symbols-outlined">
                         more_vert
                     </span>

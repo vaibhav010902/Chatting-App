@@ -1,4 +1,4 @@
-import { Client, Databases, Query } from "appwrite";
+import { Client, Databases, ID, Query } from "appwrite";
 import conf from "../conf/conf";
 
 export class RelationshipServices{
@@ -32,7 +32,7 @@ export class RelationshipServices{
         }
     }
 
-    async friendRequestAccept({relationshipId,fromUserId, toUserId}){
+    async friendRequestAccept(relationshipId){
         try {
             await this.database.updateDocument(
                 conf.appwriteDatabaseID,
@@ -79,6 +79,21 @@ export class RelationshipServices{
         }
     }
 
+    async relationshipType({fromUserId, toUserId}){
+        try {
+            const response = await this.database.listDocuments(
+                conf.appwriteDatabaseID,
+                conf.appwriteRelationshipCollectionID,
+                [
+                    Query.equal("fromUserId",toUserId),
+                    Query.equal("toUserId",fromUserId)
+                ]
+            )
+            return response.documents;
+        } catch (error) {
+            console.log("Appwrite service :: relationship type :: error", error)
+        }
+    }
     async getRelationshipList({toUserId,status}){
         try {
             const response = await this.database.listDocuments(

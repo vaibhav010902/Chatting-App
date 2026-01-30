@@ -21,7 +21,7 @@ import VoiceWaveform from "../VoiceWaveform";
 import { generateWaveform } from "../utils/generateWaveform";
 import relationshipServices from "../../appwrite/relationshipServices";
 
-function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userProfile }) {
+function ChatPanel({ currentChat, setCurrentChat, userProfile, unseenMsg }) {
   const [emojiVisibility, setEmojiVisibility] = useState(false);
   const fileRef = useRef();
   const [text, setText] = useState("");
@@ -40,9 +40,11 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
   const userData = useSelector((state) => state.auth.userData);
   const [micVisibility, setMicVisibility] = useState(true);
   const [micStopVisibility, setMicStopVisibility] = useState(false);
-  const [recordingCancelVisibility, setRecordingCancelVisibility] =useState(false);
+  const [recordingCancelVisibility, setRecordingCancelVisibility] =
+    useState(false);
   const [sendBtnVisibility, setSendBtnVisibility] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const chatRef = useRef(null);
 
   // const dispatch = useDispatch();
   // const messages = useSelector((state) => state.chat.messages);
@@ -191,21 +193,35 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
     );
 
     if (isNotFriend) {
-      try {
+      const requestByOther = await relationshipServices.relationshipType({
+        fromUserId: userData.$id,
+        toUserId: currentChat.$id,
+      });
+      const requestByUser = await relationshipServices.relationshipType({
+        fromUserId: currentChat.$id,
+        toUserId: userData.$id,
+      });
+      // console.log("Relationship: ", response, isNotFriend);
+      if (requestByUser.length == 0 && requestByOther.length == 0) {
+        console.log("New Contact");
         await profileServices.updateProfile({
           userId: userProfile.$id,
-          friends: [...new Set([...userProfile.friends, currentChat.$id])]
+          friends: [...new Set([...userProfile.friends, currentChat.$id])],
         });
         await relationshipServices.friendRequest({
-          relationshipId: ID.unique()+Date.toISOString,
+          relationshipId: ID.unique() + Date.now(),
           fromUserId: userProfile.$id,
           toUserId: currentChat.$id,
-        })
-      } catch (error) {
-        console.error("Failed to update friends", error);
+        });
+      } else if (requestByOther[0].status == "pending") {
+        console.log("Friend Request Accept");
+        await relationshipServices.friendRequestAccept(requestByOther[0].$id);
+        await profileServices.updateProfile({
+          userId: userProfile.$id,
+          friends: [...new Set([...userProfile.friends, currentChat.$id])],
+        });
       }
     }
-
     // UPLOAD MEDIA (WAIT HERE)
     let mediaFiles = [];
     let msgType = null;
@@ -232,10 +248,10 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
         fileID,
         file: previewFile,
       });
-      uploaded = uploaded.replace("preview","view")
+      uploaded = uploaded.replace("preview", "view");
       msgType = "voice";
       mediaFiles.push(uploaded);
-      sendPreview()
+      sendPreview();
     }
 
     // CREATE MESSAGE (NOW mediaFiles IS READY ✅)
@@ -243,7 +259,8 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
       id: ID.unique(),
       chatId: currentChat?.$id,
       senderId: userData.$id,
-      type: msgType == "voice" ? "voice" : msgType == "image"? "image" : "text",
+      type:
+        msgType == "voice" ? "voice" : msgType == "image" ? "image" : "text",
       content: text || "",
       mediaUrl: mediaFiles,
       createdAt: new Date().toISOString(),
@@ -263,7 +280,6 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
     setText("");
     setImageFiles([]);
     msgType = "";
-
   };
 
   const getMessage = async () => {
@@ -273,6 +289,28 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
       setMessages(response.documents);
     } catch (error) {
       setMessages([]);
+      console.log("Something went wrong: ", error);
+    }
+  };
+
+  const updateMessageStatus = () => {
+    let messageIDs = unseenMsg
+      .filter(
+        (msg) => msg.senderId === currentChat.$id && msg.status === "delivered"
+      )
+      .map((msg) => msg.$id);
+    console.log("Message IDs: ", messageIDs);
+    try {
+      if (messageIDs.length == 0) return;
+      messageIDs.forEach(
+        async (msgId) =>
+          await messagesService.updateMessageStatus({
+            msgId: msgId,
+            status: "seen",
+          })
+      );
+      console.log("Message Update Successfully!");
+    } catch (error) {
       console.log("Something went wrong: ", error);
     }
   };
@@ -294,6 +332,7 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
   useEffect(() => {
     if (!currentChat?.$id) return;
     getMessage();
+    updateMessageStatus();
   }, [currentChat?.$id]);
 
   useEffect(() => {
@@ -447,6 +486,13 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
     };
   }, [previewFile]);
 
+  useEffect(() => {
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
+  }, [messages]);
+  
+
   return (
     <div className={styles.chat_panel_container}>
       <div className={styles.chat_panel_header_container}>
@@ -470,7 +516,7 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
         </div>
       </div>
 
-      <div className={styles.chat_panel_main_container}>
+      <div className={styles.chat_panel_main_container} ref={chatRef}>
         <ul className={styles.chats}>
           {messages?.map((msg) => (
             <MessageTile
@@ -484,10 +530,12 @@ function ChatPanel({ currentChat,currentChatUserProfile, setCurrentChat, userPro
               }
               deleteMessage={deleteMessage}
               editMessage={editMessage}
+              // msgStatus={msg.status}
               time={msg.createdAt.slice(11, 16)}
             />
           ))}
         </ul>
+        {/* <div ref={messagesEndRef} /> */}
       </div>
 
       <div className={styles.chat_input_container}>

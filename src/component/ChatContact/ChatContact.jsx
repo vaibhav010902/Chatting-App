@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
 
-function ChatContact({ friends, setCurrentChat }) {
+function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   const [text, setText] = useState("");
   const [filterUser, setFilterUser] = useState(friends);
   const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
@@ -55,7 +55,6 @@ function ChatContact({ friends, setCurrentChat }) {
       console.log("error: ",error);
     }
   }
-
   return (
     <>
       <div className={styles.chatcontact}>
@@ -103,6 +102,8 @@ function ChatContact({ friends, setCurrentChat }) {
                   contact_name={friend.first_name + " " + friend.last_name}
                   contact_msg={friend.status}
                   profile_image={friend.profile_image}
+                  // status={newMessages.includes(friend.$id)}
+                  status={unseenMsg.find(msg => String(msg.senderId) === String(friend.$id))}
                   onClick={() => setCurrentChat(friend)}
                 />
               ))
