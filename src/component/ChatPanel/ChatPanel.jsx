@@ -18,6 +18,7 @@ import { generateWaveform } from "../utils/generateWaveform";
 import relationshipServices from "../../appwrite/relationshipServices";
 import { resetUnreadByUser } from "../../store/messageStatusSlice";
 
+
 function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
   const [emojiVisibility, setEmojiVisibility] = useState(false);
   const fileRef = useRef();
@@ -42,6 +43,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const chatRef = useRef(null);
   const dispatch = useDispatch();
+  const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
 
   // const dispatch = useDispatch();
   // const messages = useSelector((state) => state.chat.messages);
@@ -389,7 +391,16 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
         <div className={styles.chat_panel_header_btn_container}>
           <span className="material-symbols-outlined">call</span>
           <span className="material-symbols-outlined">video_call</span>
-          <span className="material-symbols-outlined">more_vert</span>
+          <span className="material-symbols-outlined" onClick={() => setHamburgerMenuVisibility(prev => !prev)}>more_vert</span>
+          {hamburgerMenuVisibility && 
+            <div className={styles.hamburger_menu_panel}>
+              <p>Profile</p>
+              <p>Archived</p>
+              <p>Unfriend</p>
+              <p>New Group</p>
+              <p>Settings</p>
+              <p>Block</p>
+            </div>}
         </div>
       </div>
 

@@ -58,10 +58,50 @@
     flex-direction: row;
     align-items: center;
     gap: 5px;
+    position: relative;
 }
-.contact_tile_btn_container p{
+.contact_tile_btn_container .indicator{
     width: 10px;
     height: 10px;
     border-radius: 50%;
     background-color: green;
+}
+.contact_tile_btn_container span{
+    font-size: 20px;
+    border-radius: 50%;
+    padding: 1px;
+    transition: 5ms ease-in-out;
+}
+.contact_tile_btn_container span:hover{
+    transition: 5ms ease-in;
+    background-color: white;
+}
+.hamburger_menu_panel{
+    width: 180px;
+    /* height: 100px; */
+    background-color: white;
+    /* border: 1px solid black; */
+    border-radius: 8px;
+    box-shadow: 0px 6px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 5px;
+    position: absolute;
+    top: 130%;
+    right: 1%;
+    z-index: 100;
+}
+.hamburger_menu_panel p{
+    font-size: 14px;
+    width: 100%;
+    text-align:start;
+    padding: 10px 0px 10px 15px;
+    border-radius: 5px;
+    color: black;
+}
+.hamburger_menu_panel p:hover{
+    cursor: pointer;
+    background-color: rgb(245,245,245);
 }
