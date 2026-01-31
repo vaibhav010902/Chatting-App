@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./MessageTile.module.css";
 import { ID } from "appwrite";
-import FilePreview from "../FilePreview";
+import FilePreview from "../FilePreview/FilePreview";
 
 function MessageTile({ msgId, message, messanger,type, mediaUrl, deleteMessage, editMessage, time, ...props}) {
   const [optionVisibility, setOptionVisibility] = useState(false);

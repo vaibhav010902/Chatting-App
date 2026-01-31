@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Request.module.css";
-import profileServices from "../../appwrite/profileServices";
 import { ContactTile, Loading } from "../../component";
-import relationshipServices from "../../appwrite/relationshipServices";
 
 function RequestPanel({ userProfile, users, setCurrentChat, requestList }) {
   const [text, setText] = useState("");
   const [filterUser, setFilterUser] = useState([]);
-  // const [requestList, setRequestList] = useState([]);
   const [friendRequest, setFriendRequest] = useState([]);
   const [loading, setLoading] = useState(true);
 

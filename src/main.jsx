@@ -6,12 +6,12 @@ import App from "./App.jsx";
 import store from "./store/store.js";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Home, Login, Signup } from './pages/index.js'
+import { Home, Login, Signup} from './pages/index.js'
 import { ChatPanel, Loading } from "./component/index.js";
 import Profile from "./component/Profile/Profile.jsx";
 import AuthLayout from "./component/AuthLayout.jsx";
 import { SettingPanel } from "./sidebar_panels/sidebar_panels.js";
-import FilePreview from "./component/FilePreview.jsx";
+import FilePreview from "./component/FilePreview/FilePreview.jsx";
 // import UserHome from "./component/index.js";
 
 const router = createBrowserRouter([
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/sidebar",
-        element: <FilePreview/>
+        element: <Profile/>
       },
     ],
   },
