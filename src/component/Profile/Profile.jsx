@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../Loading/Loading";
 import "./Profile.css";
 import Navbar from "../Navbar/Navbar";
+import storageServices from "../../appwrite/storage";
+import { ID } from "appwrite";
 
 function Profile() {
   console.log("Inside Profile Component....");
@@ -23,10 +25,15 @@ function Profile() {
   }
   const previewImage = () => {
     if(profileImageRef.current.files.length == 0) return;
+    // if(urlImage){
+    //   setImage(URL.createObjectURL(urlImage))
+    //   return;
+    // }
     setImage(URL.createObjectURL(profileImageRef.current.files[0]))
   }
   const uploadLocalFileImage = () => {
     if(profileImageRef.current.files.length == 0) return;
+    console.log(URL.createObjectURL(profileImageRef.current.files[0]))
     setLocalFileImage(URL.createObjectURL(profileImageRef.current.files[0]))
   }
   const removeLocalFileImage = () => {
@@ -49,7 +56,14 @@ function Profile() {
 
   const setProfile = async (data) => {
     setError("");
-    // console.log("Inside setProfile");
+    if(localFileImage){
+      const fileID = ID.unique();
+      const file = profileImageRef.current.files[0]
+      let cvtImage = await storageServices.uploadFile({fileID,file})
+      cvtImage = cvtImage.replace("preview","view")+"&mode=admin"
+      setLocalFileImage(cvtImage)
+    }
+
     try {
       // console.log("Trying to set profile")
       const session = await profileServices.setProfile({
@@ -72,6 +86,9 @@ function Profile() {
       }
     } catch (error) {
       setError(error.message);
+      if(error.message == `Invalid document structure: Attribute "profile_image" has invalid format. Value must be a valid URL`){
+        setError("Profile Image value must be a valid URL")
+      }
     }
   };
 
@@ -100,7 +117,7 @@ function Profile() {
               alt=""
               onClick={handleClick}
             />)}
-            <input type="file" hidden ref={profileImageRef} onChange={previewImage} />
+            <input type="file" hidden ref={profileImageRef} onChange={previewImage}/>
             <button onClick={uploadLocalFileImage}>Upload</button>
             {localFileImage && <button onClick={removeLocalFileImage}>Remove</button>}
           </div>
@@ -129,6 +146,16 @@ function Profile() {
               >
                 Profile Setup
               </p>
+              {error && <p 
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  color: "red",
+                  width: "100%",
+                  textAlign: "center",
+                  marginBottom: "10px"
+                }}  
+              >{error}</p>}
               <Input
                 label="First Name"
                 type="text"
