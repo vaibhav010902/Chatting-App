@@ -16,8 +16,8 @@ import { addProfile } from "../../store/userProfileSlice.js";
 
 function UserHome() {
   const userData = useSelector((state) => state.auth.userData);
+  const userProfile = useSelector(state => state.userprofile.userProfile);
 
-  const [userProfile, setUserProfile] = useState({});
   const [loading, setLoading] = useState(true);
   const [currentChat, setCurrentChat] = useState("");
   const [activePanel, setActivePanel] = useState("Friends");
@@ -32,7 +32,7 @@ function UserHome() {
   const panels = [
     {
       name: "Profile",
-      component: <ProfilePanel userProfile={userProfile} setUserProfile={setUserProfile}/>,
+      component: <ProfilePanel/>,
       status: false,
     },
     {
@@ -54,12 +54,12 @@ function UserHome() {
     },
     {
       name: "Requests",
-      component: <RequestPanel userProfile={userProfile} users={users} setCurrentChat={setCurrentChat} requestList={requestList}/>,
+      component: <RequestPanel users={users} setCurrentChat={setCurrentChat} requestList={requestList}/>,
       status: false,
     },
     {
       name: "Settings",
-      component: <SettingPanel userProfile={userProfile} />,
+      component: <SettingPanel/>,
       status: false,
     },
   ];
@@ -73,11 +73,11 @@ function UserHome() {
       if (!userData?.$id) return;
       try {
         const response = await profileServices.getProfile(userData.$id);
-        setUserProfile(response.documents[0]);
+        // setUserProfile(response.documents[0]);
         dispatch(addProfile(response.documents[0]))
       } catch (error) {
         console.log("Error fetching profile:", error.message);
-        setUserProfile(null);
+        // setUserProfile(null);
       } finally {
         setLoading(false);
       }
@@ -125,7 +125,7 @@ function UserHome() {
       }
     };
     getUsers();
-  }, [userProfile?.$id]);
+  }, [userData?.$id]);
 
   useEffect(() => {
     if (!users?.length || !userProfile?.friends?.length) return setFriends([]);
@@ -188,7 +188,6 @@ function UserHome() {
               <ChatPanel
                 currentChat={currentChat}
                 setCurrentChat={setCurrentChat}
-                userProfile={userProfile}
                 unseenMsg={unseenMsg}
               />
             )}

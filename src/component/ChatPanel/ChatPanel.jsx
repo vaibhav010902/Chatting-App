@@ -17,9 +17,10 @@ import VoiceWaveform from "../VoiceWaveform";
 import { generateWaveform } from "../utils/generateWaveform";
 import relationshipServices from "../../appwrite/relationshipServices";
 import { resetUnreadByUser } from "../../store/messageStatusSlice";
+import { updateProfile } from "../../store/userProfileSlice";
 
 
-function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
+function ChatPanel({ currentChat, setCurrentChat}) {
   const [emojiVisibility, setEmojiVisibility] = useState(false);
   const fileRef = useRef();
   const [text, setText] = useState("");
@@ -44,6 +45,7 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
   const chatRef = useRef(null);
   const dispatch = useDispatch();
   const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
+  const userProfile = useSelector(state => state.userprofile.userProfile);
 
   // const dispatch = useDispatch();
   // const messages = useSelector((state) => state.chat.messages);
@@ -91,10 +93,11 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
 
       if (requestByUser.length == 0 && requestByOther.length == 0) {
         console.log("New Contact");
-        await profileServices.updateProfile({
+        const response = await profileServices.updateProfile({
           userId: userProfile.$id,
           friends: [...new Set([...userProfile.friends, currentChat.$id])],
         });
+        dispatch(updateProfile(response))
         await relationshipServices.friendRequest({
           relationshipId: ID.unique() + Date.now(),
           fromUserId: userProfile.$id,
@@ -103,10 +106,11 @@ function ChatPanel({ currentChat, setCurrentChat, userProfile}) {
       } else if (requestByOther[0].status == "pending") {
         console.log("Friend Request Accept");
         await relationshipServices.friendRequestAccept(requestByOther[0].$id);
-        await profileServices.updateProfile({
+        const response = await profileServices.updateProfile({
           userId: userProfile.$id,
           friends: [...new Set([...userProfile.friends, currentChat.$id])],
         });
+        dispatch(updateProfile(response))
       }
     }
     // UPLOAD MEDIA (WAIT HERE)

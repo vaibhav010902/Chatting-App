@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Request.module.css";
 import { ContactTile, Loading } from "../../component";
+import { useSelector } from "react-redux";
 
-function RequestPanel({ userProfile, users, setCurrentChat, requestList }) {
+function RequestPanel({users, setCurrentChat, requestList }) {
+  const userProfile = useSelector(state => state.userprofile.userProfile);
   const [text, setText] = useState("");
   const [filterUser, setFilterUser] = useState([]);
   const [friendRequest, setFriendRequest] = useState([]);
@@ -42,7 +44,7 @@ function RequestPanel({ userProfile, users, setCurrentChat, requestList }) {
       <div className={styles.chatcontact}>
          <div className={styles.chatcontact_container}>
           <div className={styles.chatcontact_header_container}>
-            <h1>Chat App</h1>
+            <h1>Friend-Circle</h1>
           </div>
           <div className={styles.chatcontact_search_bar_container}>
             <input

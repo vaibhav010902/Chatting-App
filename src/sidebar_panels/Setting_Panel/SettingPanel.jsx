@@ -2,22 +2,11 @@ import styles from "./SettingPanel.module.css";
 import React, { useState } from "react";
 import { Button, ContactTile } from "../../component";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 
-function SettingPanel({ userProfile }) {
-  const [edit, setEdit] = useState(false);
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      name: userProfile?.first_name + " " + userProfile?.last_name,
-      email: userProfile?.email,
-      phone: userProfile?.phone,
-      dob: userProfile?.dob,
-      status: userProfile?.status,
-    },
-  });
+function SettingPanel() {
+  const userProfile = useSelector((state) => state.userprofile.userProfile);
 
-  const editSubmit = () => {
-    setEdit((prev) => !prev);
-  };
   return (
     <>
       <div className={styles.settings_panel}>
