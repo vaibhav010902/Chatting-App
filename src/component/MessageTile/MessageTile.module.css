@@ -1,6 +1,6 @@
 .message_tile{
     border: 1px solid black;
-    padding: 5px 10px;
+    padding: 5px 10px 12px 10px;
     font-size: 15px;
     display: flex;
     flex-direction: column;
@@ -9,6 +9,7 @@
     background-color: white;
     border: none;
     position: relative;
+    height: max-content;
     /* z-index: 1; */
 }
 
@@ -39,15 +40,25 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0px 5px;
+    padding: 0px 12px 0px 5px;
     gap: 10px;
     width: 100%;
     position: relative;
     /* z-index: 1; */
 }
-.message_container p{
+.message_container .message{
     align-content: flex-start;
     margin-right: 30px;
+}
+.message_container .time{
+    position: absolute;
+    right: 5px;
+    bottom: -8px;
+    font-size: 10px;
+    font-weight: bold;
+    color: black;
+    align-content: flex-end;
+    text-align: end;
 }
 .message_container span{
     position: absolute;
@@ -58,12 +69,6 @@
     align-content: flex-end;
     opacity: 0;
 }
-/* .message_tile .material-symbols-outlined{
-    font-size: 25px;
-    opacity: 0;
-    margin: 0;
-    padding: 0;
-} */
 .message_container span:hover{
     opacity: 1;
     cursor: pointer;

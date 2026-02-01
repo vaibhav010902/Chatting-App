@@ -110,6 +110,46 @@ export class RelationshipServices{
         }
     }
 
+    async getRelationshipId({fromUserId,toUserId}){
+        try {
+            const response = await this.database.listDocuments(
+                conf.appwriteDatabaseID,
+                conf.appwriteRelationshipCollectionID,
+                [
+                    Query.or([
+                        Query.and([
+                          Query.equal("fromUserId", fromUserId),
+                          Query.equal("toUserId", toUserId),
+                        ]),
+                        Query.and([
+                          Query.equal("fromUserId", toUserId),
+                          Query.equal("toUserId", fromUserId),
+                        ]),
+                    ])
+                ]
+            )
+            return response.documents[0].$id
+        } catch (error) {
+            console.log("Appwrite service :: Update Relationship :: error", error)
+        }
+    }
+
+    async updateRelationship(relationshipId){
+        try {
+            await this.database.updateDocument(
+                conf.appwriteDatabaseID,
+                conf.appwriteRelationshipCollectionID,
+                relationshipId,
+                {
+                    archived: true
+                }
+            )
+            console.log("Contact Archived Succesfully!!!")
+        } catch (error) {
+            console.log("Appwrite service :: get request list :: error", error)
+        }
+    }
+
 }
 
 const relationshipServices = new RelationshipServices();

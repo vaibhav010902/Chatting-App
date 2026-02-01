@@ -82,7 +82,7 @@ export class ProfileServices{
         }
     }
 
-    async updateProfile({userId, first_name, last_name, email, phone, dob, status, profile_image,friends, $createdAt}){
+    async updateProfile({userId, first_name, last_name, email, phone, dob, status, profile_image,friends,archived,favourites, $createdAt}){
         try {
             const session = await this.databases.updateDocument(
                 conf.appwriteDatabaseID,
@@ -97,12 +97,14 @@ export class ProfileServices{
                     profile_image,
                     status,
                     friends,
+                    archived,
+                    favourites,
                     $createdAt,
                     $updatedAt: Date.now()
                 }
             )
             if(session){
-                console.log("Successfully Profile updated", session)
+                return session;
             }
         } catch (error) {
             console.log("Appwrite Profile Service :: setProfile :: error: ", error);

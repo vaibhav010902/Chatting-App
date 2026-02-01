@@ -3,33 +3,36 @@ import styles from "./ProfilePanel.module.css";
 import { Button, ContactTile } from "../../component";
 import { useForm } from "react-hook-form";
 import profileServices from "../../appwrite/profileServices";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProfile } from "../../store/userProfileSlice";
 
 function ProfilePanel({ userProfile, setUserProfile }) {
+  const profile = useSelector(state => state.userprofile.userProfile);
+  const dispatch = useDispatch();
   const [edit, setEdit] = useState(false);
   const { register, handleSubmit } = useForm({
     defaultValues: {
-      name: userProfile?.first_name + " "  + userProfile?.last_name,
-      email: userProfile?.email,
-      phone: userProfile?.phone,
-      dob: userProfile?.dob.slice(0,10),
-      status: userProfile?.status,
+      name: profile?.first_name + " "  + profile?.last_name,
+      email: profile?.email,
+      phone: profile?.phone,
+      dob: profile?.dob.slice(0,10),
+      status: profile?.status,
     },
   });
 
   const editSubmit = async (data) => {
     setEdit(prev => !prev);
-    console.log(data);
     
     const response = await profileServices.updateProfile({
-      userId: userProfile.$id,
+      userId: profile.$id,
       first_name: data.name.split(" ")[0],
-      last_name: data.name.split(" ")[1]+" "+data.name.split(" ")[2],
+      last_name: data?.name?.split(" ").slice(1).join(" ")      ,
       email: data.email,
       phone: data.phone,
       dob: data.dob,
       status: data.status,
     })
-    setUserProfile(response);
+    dispatch(updateProfile(response))
   };
 
   return (
@@ -40,7 +43,7 @@ function ProfilePanel({ userProfile, setUserProfile }) {
             <h1>Chat App</h1>
           </div>
           <div className={styles.profile_panel_img_container}>
-            <img src={userProfile?.profile_image} alt="" className={styles.user_profile_image} />
+            <img src={profile?.profile_image} alt="" className={styles.user_profile_image} />
           </div>
           <form
             className={styles.profile_panel_fields_container}
@@ -49,7 +52,7 @@ function ProfilePanel({ userProfile, setUserProfile }) {
             <div className={styles.field_container}>
               <label htmlFor="name">Name</label>
               {!edit ? (
-                <p>{ userProfile?.first_name + " " + userProfile?.last_name}</p>
+                <p>{ profile?.first_name + " " + profile?.last_name}</p>
               ) : (
                 <input
                   type="text"
@@ -61,7 +64,7 @@ function ProfilePanel({ userProfile, setUserProfile }) {
             <div className={styles.field_container}>
               <label htmlFor="email">Email</label>
               {!edit ? (
-                <p>{userProfile?.email}</p>
+                <p>{profile?.email}</p>
               ) : (
                 <input
                   type="email"
@@ -81,7 +84,7 @@ function ProfilePanel({ userProfile, setUserProfile }) {
             <div className={styles.field_container}>
               <label htmlFor="phone">Phone</label>
               {!edit ? (
-                <p>{userProfile?.phone}</p>
+                <p>{profile?.phone}</p>
               ) : (
                 <input
                   type="number"
@@ -99,7 +102,7 @@ function ProfilePanel({ userProfile, setUserProfile }) {
             <div className={styles.field_container}>
               <label htmlFor="dob">DOB</label>
               {!edit ? (
-                <p>{userProfile?.dob.slice(0,10)}</p>
+                <p>{profile?.dob.slice(0,10)}</p>
               ) : (
                 <input
                   type="date"
@@ -111,7 +114,7 @@ function ProfilePanel({ userProfile, setUserProfile }) {
             <div className={styles.field_container}>
               <label htmlFor="status">Status</label>
               {!edit ? (
-                <p>{userProfile?.status}</p>
+                <p>{profile?.status}</p>
               ) : (
                 <input
                   type="text"

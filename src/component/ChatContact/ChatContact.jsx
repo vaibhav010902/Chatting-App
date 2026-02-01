@@ -10,6 +10,7 @@ import { logout } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
 import messagesService from "../../appwrite/messagesService";
 import { resetUnreadByUser } from "../../store/messageStatusSlice";
+import relationshipServices from "../../appwrite/relationshipServices";
 
 function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   const [text, setText] = useState("");
@@ -48,7 +49,7 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   const handleSettingsBtn = () => {
     console.log("Settings Btn Clicked")
   }
-  
+
   const handleLogoutBtn = async () => {
     try {
       await authServices.logoutAccount()
@@ -60,9 +61,7 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   }
 
   const openChat = async (friendId) => {
-    // console.log("Hello guyz, mein OPENCHAT from ChatContact.jsx")
     dispatch(resetUnreadByUser(friendId));
-  
     unseenMsg.map(async (msg) => {
       if(String(msg.senderId) === String(friendId)){
         await messagesService.updateMessageStatus({
@@ -73,6 +72,7 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
     }
     )
   };
+
   return (
     <>
       <div className={styles.chatcontact}>
@@ -117,6 +117,7 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
               filterUser?.map((friend) => (
                 <ContactTile
                   key={friend.$id}
+                  contact_id={friend.$id}
                   contact_name={friend.first_name + " " + friend.last_name}
                   contact_msg={friend.status}
                   profile_image={friend.profile_image}

@@ -40,7 +40,8 @@ function MessageTile({ msgId, message, messanger,type, mediaUrl, deleteMessage, 
           <FilePreview mediaUrl={mediaUrl}/>
         )}
         <div className={styles.message_container}>
-          <p>{message}</p>
+          <p className={styles.message}>{message}</p>
+          <p className={styles.time}>{time}</p>
           <span
             className="material-symbols-outlined"
             onClick={() => {

@@ -39,6 +39,7 @@ function ContactPanel({ users, setCurrentChat }) {
               filterUser?.map((user) => (
                 <ContactTile
                   key={user.$id}
+                  contact_id={user.$id}
                   contact_name={user.first_name + " " + user.last_name}
                   contact_msg={user.status}
                   profile_image={user.profile_image}

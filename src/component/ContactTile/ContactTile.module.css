@@ -100,6 +100,7 @@
     padding: 10px 0px 10px 15px;
     border-radius: 5px;
     color: black;
+    transition: 5ms ease-in-out;
 }
 .hamburger_menu_panel p:hover{
     cursor: pointer;

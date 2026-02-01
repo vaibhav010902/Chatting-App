@@ -12,6 +12,7 @@ import { client } from "../../appwrite/config";
 import conf from "../../conf/conf";
 import {useDispatch} from "react-redux";
 import { setUnreadByUser } from "../../store/messageStatusSlice.js";
+import { addProfile } from "../../store/userProfileSlice.js";
 
 function UserHome() {
   const userData = useSelector((state) => state.auth.userData);
@@ -73,6 +74,7 @@ function UserHome() {
       try {
         const response = await profileServices.getProfile(userData.$id);
         setUserProfile(response.documents[0]);
+        dispatch(addProfile(response.documents[0]))
       } catch (error) {
         console.log("Error fetching profile:", error.message);
         setUserProfile(null);
