@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     name: "Friends",
+    previous: ""
 }
 
 const activePanelSlice = createSlice({
@@ -9,6 +10,8 @@ const activePanelSlice = createSlice({
     initialState,
     reducers: {
         setActivePanel: (state, action) => {
+            console.log(state.previous,state.name);
+            state.previous = state.name;
             state.name = action.payload;
         }
     }

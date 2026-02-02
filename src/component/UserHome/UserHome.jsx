@@ -67,7 +67,7 @@ function UserHome() {
     },
     {
       name: "Contact_Profile_Panel",
-      component: <ContactProfilePanel/>,
+      component: <ContactProfilePanel users={users}/>,
       status: false,
     },
   ];
