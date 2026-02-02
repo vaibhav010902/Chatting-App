@@ -176,7 +176,7 @@ function ChatPanel({ currentChat, setCurrentChat}) {
   const getMessage = async () => {
     try {
       const response = await messagesService.getMessages(getConversationId());
-      console.log("Messages: ", response);
+      // console.log("Messages: ", response);
       setMessages(response.documents);
     } catch (error) {
       setMessages([]);

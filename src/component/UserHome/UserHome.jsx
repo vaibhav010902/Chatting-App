@@ -13,14 +13,17 @@ import conf from "../../conf/conf";
 import {useDispatch} from "react-redux";
 import { setUnreadByUser } from "../../store/messageStatusSlice.js";
 import { addProfile } from "../../store/userProfileSlice.js";
+import ContactProfilePanel from "../../sidebar_panels/ContactProfilePanel/ContactProfilePanel.jsx";
+
 
 function UserHome() {
   const userData = useSelector((state) => state.auth.userData);
   const userProfile = useSelector(state => state.userprofile.userProfile);
+  const activePanel = useSelector(state => state.activePanel.name);
 
   const [loading, setLoading] = useState(true);
   const [currentChat, setCurrentChat] = useState("");
-  const [activePanel, setActivePanel] = useState("Friends");
+  // const [activePanel, setActivePanel] = useState("Friends");
   const [users, setUsers] = useState([]);
   const [friends, setFriends] = useState(null);
   const [requestList, setRequestList] = useState([]);
@@ -60,6 +63,11 @@ function UserHome() {
     {
       name: "Settings",
       component: <SettingPanel/>,
+      status: false,
+    },
+    {
+      name: "Contact_Profile_Panel",
+      component: <ContactProfilePanel/>,
       status: false,
     },
   ];
@@ -178,8 +186,6 @@ function UserHome() {
         <>
           <div className="userhome-page">
             <Sidebar
-              activePanel={activePanel}
-              setActivePanel={setActivePanel}
               requestList={requestList}
               newMessages={newMessages.length}
             />

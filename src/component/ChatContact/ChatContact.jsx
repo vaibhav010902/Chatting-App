@@ -78,7 +78,7 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
       <div className={styles.chatcontact}>
         <div className={styles.chatcontact_container}>
           <div className={styles.chatcontact_header_container}>
-            <h1>Chat App</h1>
+            <h1>Friend-Circle</h1>
             <span 
               className="material-symbols-outlined"
               onClick={() => setHamburgerMenuVisibility(prev => !prev)}

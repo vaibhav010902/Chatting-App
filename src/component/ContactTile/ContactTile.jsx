@@ -1,11 +1,14 @@
-import React, {Component, useState} from "react";
+import React, {Component, useEffect, useRef, useState} from "react";
 import styles from "./ContactTile.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import relationshipServices from "../../appwrite/relationshipServices";
 import profileServices from "../../appwrite/profileServices";
 import { updateProfile } from "../../store/userProfileSlice";
-import { compose } from "@reduxjs/toolkit";
-
+import ContactProfilePanel from "../../sidebar_panels/ContactProfilePanel/ContactProfilePanel";
+import { ID } from "appwrite";
+import { resetUnreadByUser } from "../../store/messageStatusSlice";
+import messagesService from "../../appwrite/messagesService";
+import { setActivePanel } from "../../store/activePanelSlice";
 function ContactTile({
   contact_id,
   contact_name,
@@ -15,57 +18,148 @@ function ContactTile({
   ...props
 }) {
     const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
-    const profile = useSelector(state => state.userprofile.userProfile);
-    const dispatch = useDispatch();  
+    const userProfile = useSelector(state => state.userprofile.userProfile);
+    const dispatch = useDispatch();
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+      if(!hamburgerMenuVisibility) return;
+
+      const handleClickOutside = (e) => {
+        if(menuRef.current && !menuRef.current.contains(e.target)){
+          setHamburgerMenuVisibility(false);
+        }
+      };
+
+      const handleEsc = (e) => {
+        if(e.key === "Escape"){
+          setHamburgerMenuVisibility(false);
+        }
+      }
+
+      document.addEventListener("mousedown",handleClickOutside);
+      document.addEventListener("keydown",handleEsc);
+
+      return () => {
+        document.removeEventListener("mousedown",handleClickOutside);
+        document.removeEventListener("keydown",handleEsc);
+      }
+    },[hamburgerMenuVisibility,setHamburgerMenuVisibility])
 
     const handleProfileBtn = async () => {
-      console.log("Profile...")
+      dispatch(setActivePanel("Contact_Profile_Panel"))
     }
 
     const handleMarkAsReadBtn = async () => {
-      console.log("Mark as read...")
+      const response = await messagesService.getMessagesSendByUser({
+        activeChatId: contact_id, 
+        userId: userProfile.$id
+      })
+      response.forEach(async (msg) => {
+        await messagesService.updateMessageStatus({
+          msgId: msg.$id,
+          status: "seen"
+        })
+      })
+      dispatch(resetUnreadByUser(contact_id));
     }
 
     const handleAddToFavouriteBtn = async () => {
       const response = await profileServices.updateProfile({
-        userId: profile.$id,
-        favourites: [...profile.favourites,contact_id]
+        userId: userProfile.$id,
+        favourites: [...userProfile.favourites,contact_id]
       })
       dispatch(updateProfile(response))
     }
     const handleRemoveFromFavouriteBtn = async () => {
-      console.log("Remove from Favourites...")
+      const response = await profileServices.updateProfile({
+        userId: userProfile.$id,
+        favourites: userProfile.favourites.filter(favouriteId => favouriteId!==contact_id)
+      })
+      dispatch(updateProfile(response))
     }
 
     const handleAddToFriendBtn = async () => {
-      console.log("Add To Friend...")
+      await relationshipServices.friendRequest({
+        relationshipId: ID.unique() + Date.now(),
+        fromUserId: userProfile.$id,
+        toUserId: contact_id,
+      });
+      const response = await profileServices.updateProfile({
+        userId: userProfile.$id,
+        friends: Array.from(new Set([...userProfile.friends,contact_id]))
+      })
+      dispatch(updateProfile(response))
     }
     const handleUnfriendBtn = async () => {
-      await profileServices.updateProfile({
-        userId: profile.$id,
-        friends: profile.friends.filter(friendId => friendId !== contact_id)
+      await relationshipServices.getRelationshipId({
+        fromUserId: userProfile.$id,
+        toUserId: contact_id
+      }).then((res) => {
+        relationshipServices.updateRelationship({
+          relationshipId: res,
+          status: "pending"
+        })
+      })
+      const response = await profileServices.updateProfile({
+        userId: userProfile.$id,
+        friends: userProfile.friends.filter(friendId => friendId !== contact_id)
       })
       dispatch(updateProfile(response))
     }
 
     const handleArchivedBtn = async () => {
         const response = await profileServices.updateProfile({
-          userId: profile.$id,
-          archived: Array.from(new Set([...profile.archived,contact_id]))
+          userId: userProfile.$id,
+          archived: Array.from(new Set([...userProfile.archived,contact_id]))
         })
         dispatch(updateProfile(response))
     }
     const handleUnarchivedBtn = async () => {
-      console.log("Remove from Archived...")
+        const response = await profileServices.updateProfile({
+          userId: userProfile.$id,
+          archived: userProfile.archived.filter(archivedId => archivedId!==contact_id)
+        })
+        dispatch(updateProfile(response))
     }
     
     const handleBlockBtn = async () => {
-      console.log("Block...")
+      await relationshipServices.getRelationshipId({
+        fromUserId: userProfile.$id,
+        toUserId: contact_id
+      }).then((res) => {
+        relationshipServices.updateRelationship({
+          relationshipId: res,
+          type: "block"
+        })
+      })
+      const response = await profileServices.updateProfile({
+        userId: userProfile.$id,
+        block: Array.from(new Set([...userProfile.block,contact_id]))
+      })
+      dispatch(updateProfile(response))
+    }
+    const handleUnblockBtn = async () => {
+      await relationshipServices.getRelationshipId({
+        fromUserId: userProfile.$id,
+        toUserId: contact_id
+      }).then(async (res) => {
+        await relationshipServices.updateRelationship({
+          relationshipId: res,
+          type: "friend"
+        })
+      })
+      const response = await profileServices.updateProfile({
+        userId: userProfile.$id,
+        block: userProfile.block.filter(blockId => blockId!==contact_id)
+      })
+      dispatch(updateProfile(response))
     }
 
-    const isFriend = profile?.friends?.includes(contact_id) ?? false;
-    const isFavourite = profile?.favourites?.includes(contact_id) ?? false;
-    const isArchived = profile?.archived?.includes(contact_id) ?? false;
+    const isFriend = userProfile?.friends?.includes(contact_id) ?? false;
+    const isFavourite = userProfile?.favourites?.includes(contact_id) ?? false;
+    const isArchived = userProfile?.archived?.includes(contact_id) ?? false;
+    const isBlocked = userProfile?.block?.includes(contact_id) ?? false;
 
     const hamburgerBtns = [
       {
@@ -111,7 +205,12 @@ function ContactTile({
       {
         name: "Block",
         function: handleBlockBtn,
-        status: true
+        status: !isBlocked
+      },
+      {
+        name: "Unblock",
+        function: handleUnblockBtn,
+        status: isBlocked
       },
     ] 
   return (
@@ -147,16 +246,7 @@ function ContactTile({
           {status && <p className={styles.indicator}></p>}
           <span className="material-symbols-outlined" onClick={() => setHamburgerMenuVisibility(prev => !prev)}>more_vert</span>
           {hamburgerMenuVisibility && (
-            <div className={styles.hamburger_menu_panel}>
-              {/* <p onClick={handleProfileBtn}>Profile</p>
-              <p onClick={handleMarkAsReadBtn}>Mark as read</p>
-              <p onClick={handleAddToFavouriteBtn}>Add to Favourites</p>
-              <p onClick={handleRemoveFromFavouriteBtn}>Remove from Favourites</p>
-              <p onClick={handleAddToFriendBtn}>Add to Friend List</p>
-              <p onClick={handleUnfriendBtn}>Unfriend</p>
-              <p onClick={handleArchivedBtn}>Archived</p>
-              <p onClick={handleUnarchivedBtn}>Unarchived</p>
-              <p onClick={handleBlockBtn}>Block</p> */}
+            <div className={styles.hamburger_menu_panel} ref={menuRef}>
               {hamburgerBtns.map(btn => (
                 btn.status && <p key={btn.name} onClick={btn.function}>{btn.name}</p>
               ))}

@@ -82,7 +82,7 @@ export class ProfileServices{
         }
     }
 
-    async updateProfile({userId, first_name, last_name, email, phone, dob, status, profile_image,friends,archived,favourites, $createdAt}){
+    async updateProfile({userId, first_name, last_name, email, phone, dob, status, profile_image,friends,archived,favourites,block, $createdAt}){
         try {
             const session = await this.databases.updateDocument(
                 conf.appwriteDatabaseID,
@@ -99,6 +99,7 @@ export class ProfileServices{
                     friends,
                     archived,
                     favourites,
+                    block,
                     $createdAt,
                     $updatedAt: Date.now()
                 }

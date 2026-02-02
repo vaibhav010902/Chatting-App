@@ -131,7 +131,9 @@ export class MessagesService{
                 [
                     Query.equal("chatId", userId),
                     Query.equal("senderId", activeChatId),
-                    Query.notEqual("status", "seen")
+                    Query.notEqual("status", "seen"),
+                    Query.limit(20),
+                    Query.orderDesc("createdAt")
                 ]
             )
             // console.log("Appwrite Messages Service :: getMessagesSendByUser :: response: ", response.documents);

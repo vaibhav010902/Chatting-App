@@ -69,7 +69,7 @@ function SettingPanel() {
             <div className={styles.settings_panel_setting_tile}>
               <span className="material-symbols-outlined">settings</span>
               <div className={styles.setting_tile_content_container}>
-                <p className={styles.setting_tile_heading}>Settings</p>
+                <p className={styles.setting_tile_heading}>Blocked</p>
                 <p className={styles.setting_tile_text}>
                   This is used to change the font-size of everything...
                 </p>

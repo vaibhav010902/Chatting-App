@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import styles from "./ProfilePanel.module.css";
+import styles from "./ContactProfilePanel.module.css";
 import { Button, ContactTile } from "../../component";
 import { useForm } from "react-hook-form";
 import profileServices from "../../appwrite/profileServices";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfile } from "../../store/userProfileSlice";
 
-function ProfilePanel() {
+function ContactProfilePanel() {
   const profile = useSelector(state => state.userprofile.userProfile);
   const dispatch = useDispatch();
   const [edit, setEdit] = useState(false);
@@ -137,4 +137,4 @@ function ProfilePanel() {
   );
 }
 
-export default ProfilePanel;
+export default ContactProfilePanel;

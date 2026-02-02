@@ -4,11 +4,13 @@ import authServices from "../../appwrite/auth";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout as authLogout } from "../../store/authSlice";
+import { setActivePanel } from "../../store/activePanelSlice";
 
-function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
+function Sidebar({requestList, newMessages }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const unreadMsg = useSelector((state) => state.messageStatus.totalUnread);
+  const activePanel = useSelector((state) => state.activePanel.name);
   return (
     <>
       <nav className={styles.navbar}>
@@ -17,7 +19,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
             <div className={styles.profile_container}>
               <span
                 className="material-symbols-outlined"
-                onClick={() => setActivePanel("Profile")}
+                onClick={() => dispatch(setActivePanel("Profile"))}
                 style={{
                   padding: "8px 5px",
                   borderRadius: "10px",
@@ -35,7 +37,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
               {unreadMsg > 0 && <p>{unreadMsg}</p>}
                 <span
                   className="material-symbols-outlined"
-                  onClick={() => setActivePanel("Friends")}
+                  onClick={() => dispatch(setActivePanel("Friends"))}
                   style={{
                     backgroundColor:
                       activePanel === "Friends" ? "rgb(245,245,245)" : "white",
@@ -48,7 +50,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
               <div>
                 <span
                   className="material-symbols-outlined"
-                  onClick={() => setActivePanel("Contacts")}
+                  onClick={() => dispatch(setActivePanel("Contacts"))}
                   style={{
                     backgroundColor:
                       activePanel === "Contacts" ? "rgb(245,245,245)" : "white",
@@ -61,7 +63,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
               <div>
                 <span
                   className="material-symbols-outlined"
-                  onClick={() => setActivePanel("Groups")}
+                  onClick={() => dispatch(setActivePanel("Groups"))}
                   style={{
                     backgroundColor:
                       activePanel === "Groups" ? "rgb(245,245,245)" : "white",
@@ -75,7 +77,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
                 {requestList.length > 0 && <p>{requestList.length}</p>}
                 <span
                   className="material-symbols-outlined"
-                  onClick={() => setActivePanel("Requests")}
+                  onClick={() => dispatch(setActivePanel("Requests"))}
                   style={{
                     backgroundColor:
                       activePanel === "Requests" ? "rgb(245,245,245)" : "white",
@@ -91,7 +93,7 @@ function Sidebar({ activePanel, setActivePanel, requestList, newMessages }) {
           <div className={styles.navbar_container_2}>
               <span
                 className="material-symbols-outlined"
-                onClick={() => setActivePanel("Settings")}
+                onClick={() => dispatch(setActivePanel("Settings"))}
                 style={{
                   backgroundColor:
                     activePanel === "Settings" ? "rgb(245,245,245)" : "white",

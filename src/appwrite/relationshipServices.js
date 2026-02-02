@@ -134,22 +134,33 @@ export class RelationshipServices{
         }
     }
 
-    async updateRelationship(relationshipId){
+    async updateRelationship({relationshipId,type,status}){
         try {
             await this.database.updateDocument(
                 conf.appwriteDatabaseID,
                 conf.appwriteRelationshipCollectionID,
                 relationshipId,
                 {
-                    archived: true
+                    type: type
                 }
             )
-            console.log("Contact Archived Succesfully!!!")
         } catch (error) {
             console.log("Appwrite service :: get request list :: error", error)
         }
     }
 
+    async getRelationship({relationshipId}){
+        try {
+            const response = await this.database.getDocument(
+                conf.appwriteDatabaseID,
+                conf.appwriteRelationshipCollectionID,
+                relationshipId
+            )
+            return response
+        } catch (error) {
+            console.log("Appwrite service :: get request list :: error", error)
+        }
+    }
 }
 
 const relationshipServices = new RelationshipServices();
