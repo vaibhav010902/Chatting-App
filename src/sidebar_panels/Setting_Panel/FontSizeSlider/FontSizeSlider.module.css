@@ -1,0 +1,53 @@
+.font_size_btn_container {
+    width: 100%;
+    /* padding: 10px; */
+    /* margin-top: 10px; */
+  }
+  
+  .font_size_slider_btn {
+    display: flex;
+    align-items: center;
+  }
+  
+  .step_wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+  .step_wrapper:last-child {
+    flex: 0;
+  }
+  
+  
+  .font_size_btn {
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  
+  .font_size_btn span {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+  }
+  
+  .font_size_lines {
+    flex: 1;
+    height: 3px;
+    background-color: #fff;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .active {
+    background-color: black;
+  }
+  

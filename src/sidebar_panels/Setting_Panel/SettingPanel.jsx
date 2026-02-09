@@ -8,6 +8,7 @@ import storageServices from "../../appwrite/storage";
 import { ID } from "appwrite";
 import { setChatTheme, setChatWallpaper } from "../../store/settingSlice";
 import settingServices from "../../appwrite/settingServices";
+import FontSizeSlider from "./FontSizeSlider/FontSizeSlider";
 
 function SettingPanel() {
   const userProfile = useSelector((state) => state.userprofile.userProfile);
@@ -16,6 +17,18 @@ function SettingPanel() {
   const dispatch = useDispatch();
   const inputRef = useRef(null);
   const fontsizesliderRef = useRef(null);
+  const sFontSizeRef = useRef(null);
+  const xsFontSizeLineRef = useRef(null);
+  const xsFontSizeRef = useRef(null);
+  const mFontSizeLineRef = useRef(null);
+  const mFontSizeRef = useRef(null);
+  const xmFontSizeLineRef = useRef(null);
+  const xmFontSizeRef = useRef(null);
+  const lFontSizeLineRef = useRef(null);
+  const lFontSizeRef = useRef(null);
+  const xlFontSizeLineRef = useRef(null);
+  const xlFontSizeRef = useRef(null);
+
   const [show, setShow] = useState("");
   const [wallpaperFile, setWallpaperFile] = useState(null);
 
@@ -67,6 +80,84 @@ function SettingPanel() {
     });
     setShow("");
   };
+  const handleSFontSizeBtn = () => {
+    sFontSizeRef.current.style.backgroundColor = "black";
+    xsFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xsFontSizeRef.current.style.backgroundColor = "#fff";
+    mFontSizeLineRef.current.style.backgroundColor = "#fff";
+    mFontSizeRef.current.style.backgroundColor = "#fff";
+    xmFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xmFontSizeRef.current.style.backgroundColor = "#fff";
+    lFontSizeLineRef.current.style.backgroundColor = "#fff";
+    lFontSizeRef.current.style.backgroundColor = "#fff";
+    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xlFontSizeRef.current.style.backgroundColor = "#fff";
+  }
+  const handleXSFontSizeBtn = () => {
+    sFontSizeRef.current.style.backgroundColor = "black";
+    xsFontSizeLineRef.current.style.backgroundColor = "black";
+    xsFontSizeRef.current.style.backgroundColor = "black";
+    mFontSizeLineRef.current.style.backgroundColor = "#fff";
+    mFontSizeRef.current.style.backgroundColor = "#fff";
+    xmFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xmFontSizeRef.current.style.backgroundColor = "#fff";
+    lFontSizeLineRef.current.style.backgroundColor = "#fff";
+    lFontSizeRef.current.style.backgroundColor = "#fff";
+    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xlFontSizeRef.current.style.backgroundColor = "#fff";
+  }
+  const handleMFontSizeBtn = () => {
+    sFontSizeRef.current.style.backgroundColor = "black";
+    xsFontSizeLineRef.current.style.backgroundColor = "black";
+    xsFontSizeRef.current.style.backgroundColor = "black";
+    mFontSizeLineRef.current.style.backgroundColor = "black";
+    mFontSizeRef.current.style.backgroundColor = "black";
+    xmFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xmFontSizeRef.current.style.backgroundColor = "#fff";
+    lFontSizeLineRef.current.style.backgroundColor = "#fff";
+    lFontSizeRef.current.style.backgroundColor = "#fff";
+    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xlFontSizeRef.current.style.backgroundColor = "#fff";
+  }
+  const handleXMFontSizeBtn = () => {
+    sFontSizeRef.current.style.backgroundColor = "black";
+    xsFontSizeLineRef.current.style.backgroundColor = "black";
+    xsFontSizeRef.current.style.backgroundColor = "black";
+    mFontSizeLineRef.current.style.backgroundColor = "black";
+    mFontSizeRef.current.style.backgroundColor = "black";
+    xmFontSizeLineRef.current.style.backgroundColor = "black";
+    xmFontSizeRef.current.style.backgroundColor = "black";
+    lFontSizeLineRef.current.style.backgroundColor = "#fff";
+    lFontSizeRef.current.style.backgroundColor = "#fff";
+    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xlFontSizeRef.current.style.backgroundColor = "#fff";
+  }
+  const handleLFontSizeBtn = () => {
+    sFontSizeRef.current.style.backgroundColor = "black";
+    xsFontSizeLineRef.current.style.backgroundColor = "black";
+    xsFontSizeRef.current.style.backgroundColor = "black";
+    mFontSizeLineRef.current.style.backgroundColor = "black";
+    mFontSizeRef.current.style.backgroundColor = "black";
+    xmFontSizeLineRef.current.style.backgroundColor = "black";
+    xmFontSizeRef.current.style.backgroundColor = "black";
+    lFontSizeLineRef.current.style.backgroundColor = "black";
+    lFontSizeRef.current.style.backgroundColor = "black";
+    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
+    xlFontSizeRef.current.style.backgroundColor = "#fff";
+  }
+  const handleXLFontSizeBtn = () => {
+    sFontSizeRef.current.style.backgroundColor = "black";
+    xsFontSizeLineRef.current.style.backgroundColor = "black";
+    xsFontSizeRef.current.style.backgroundColor = "black";
+    mFontSizeLineRef.current.style.backgroundColor = "black";
+    mFontSizeRef.current.style.backgroundColor = "black";
+    xmFontSizeLineRef.current.style.backgroundColor = "black";
+    xmFontSizeRef.current.style.backgroundColor = "black";
+    lFontSizeLineRef.current.style.backgroundColor = "black";
+    lFontSizeRef.current.style.backgroundColor = "black";
+    xlFontSizeLineRef.current.style.backgroundColor = "black";
+    xlFontSizeRef.current.style.backgroundColor = "black";
+  }
 
   return (
     <>
@@ -200,7 +291,7 @@ function SettingPanel() {
                     Font Size
                   </p>
                   <p className={styles.font_size_btn_header_theme_indicator}>
-                    Light
+                    {chatSettings?.chatTheme}
                   </p>
                   <span
                     className="material-symbols-outlined"
@@ -210,32 +301,33 @@ function SettingPanel() {
                   </span>
                 </div>
                 <div className={styles.font_size_btn_container}>
-                  <div className={styles.font_size_slider_btn}>
-                    <p className={styles.font_size_btn}>
+                <FontSizeSlider/>
+                {/* <div className={styles.font_size_slider_btn}>
+                    <p className={styles.font_size_btn} ref={sFontSizeRef} onClick={handleSFontSizeBtn}>
                       <p>S</p>
                     </p>
-                    <p className={styles.font_size_lines}></p>
-                    <p className={styles.font_size_btn}>
+                    <p className={styles.font_size_lines} ref={xsFontSizeLineRef}></p>
+                    <p className={styles.font_size_btn} ref={xsFontSizeRef} onClick={handleXSFontSizeBtn}>
                       <p>XS</p>
                     </p>
-                    <p className={styles.font_size_lines}></p>
-                    <p className={styles.font_size_btn}>
+                    <p className={styles.font_size_lines} ref={mFontSizeLineRef}></p>
+                    <p className={styles.font_size_btn} ref={mFontSizeRef} onClick={handleMFontSizeBtn}>
                       <p>M</p>
                     </p>
-                    <p className={styles.font_size_lines}></p>
-                    <p className={styles.font_size_btn}>
+                    <p className={styles.font_size_lines} ref={xmFontSizeLineRef}></p>
+                    <p className={styles.font_size_btn} ref={xmFontSizeRef} onClick={handleXMFontSizeBtn}>
                       <p>XM</p>
                     </p>
-                    <p className={styles.font_size_lines}></p>
-                    <p className={styles.font_size_btn}>
+                    <p className={styles.font_size_lines} ref={lFontSizeLineRef}></p>
+                    <p className={styles.font_size_btn} ref={lFontSizeRef} onClick={handleLFontSizeBtn}>
                       <p>L</p>
                     </p>
-                    <p className={styles.font_size_lines}></p>
-                    <p className={styles.font_size_btn}>
+                    <p className={styles.font_size_lines} ref={xlFontSizeLineRef}></p>
+                    <p className={styles.font_size_btn} ref={xlFontSizeRef} onClick={handleXLFontSizeBtn}>
                       <p>XL</p>
                     </p>
                     <p className={styles.font_size_slider_btn_selector} ref={fontsizesliderRef} onClick={handleSliderSelector}></p>
-                  </div>
+                  </div>  */}
                   <button>Set Font Size</button>
                 </div>
               </div>

@@ -213,8 +213,8 @@ function UserHome() {
               requestList={requestList}
               newMessages={newMessages.length}
             />
-            {activePanelComponent}
-            {/* <SettingPanel/> */}
+            {/* {activePanelComponent} */}
+            <SettingPanel/>
             {currentChat?.$id && (
               <ChatPanel
                 currentChat={currentChat}
