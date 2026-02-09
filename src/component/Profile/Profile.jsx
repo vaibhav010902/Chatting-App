@@ -9,6 +9,7 @@ import "./Profile.css";
 import Navbar from "../Navbar/Navbar";
 import storageServices from "../../appwrite/storage";
 import { ID } from "appwrite";
+import settingServices from "../../appwrite/settingServices";
 
 function Profile() {
   console.log("Inside Profile Component....");
@@ -80,6 +81,7 @@ function Profile() {
       // console.log("After Callling setProfile function of profileServices.js")
       if (session) {
         console.log("Profile set successfully");
+        await settingServices.createSettings(userData.$id);
         navigate("/");
       } else {
         setError("Something went wrong!!! Please try again later");

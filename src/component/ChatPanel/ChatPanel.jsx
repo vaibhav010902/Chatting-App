@@ -46,6 +46,8 @@ function ChatPanel({ currentChat, setCurrentChat}) {
   const dispatch = useDispatch();
   const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
   const userProfile = useSelector(state => state.userprofile.userProfile);
+  const userSettings = useSelector(state => state.settings)
+  console.log(userSettings)
 
   // const dispatch = useDispatch();
   // const messages = useSelector((state) => state.chat.messages);
@@ -377,7 +379,13 @@ function ChatPanel({ currentChat, setCurrentChat}) {
   }, [messages]);
 
   return (
-    <div className={styles.chat_panel_container}>
+    <div className={styles.chat_panel_container} 
+          style={{backgroundImage: userSettings?.chatWallpaper && `url(${userSettings?.chatWallpaper})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat"
+          }}
+    >
       <div className={styles.chat_panel_header_container}>
         <div className={styles.chat_panel_header_container_1}>
           <span
@@ -408,7 +416,7 @@ function ChatPanel({ currentChat, setCurrentChat}) {
         </div>
       </div>
 
-      <div className={styles.chat_panel_main_container} ref={chatRef}>
+      <div className={styles.chat_panel_main_container} ref={chatRef} >
         <ul className={styles.chats}>
           {messages?.map((msg) => (
             <MessageTile

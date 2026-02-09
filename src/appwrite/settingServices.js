@@ -1,4 +1,4 @@
-import { Client, Databases } from "appwrite";
+import { Client, Databases, Query } from "appwrite";
 import conf from "../conf/conf";
 
 export class SettingServices{
@@ -12,14 +12,32 @@ export class SettingServices{
         this.databases = new Databases(this.client);
     }
 
+    async createSettings(userId){
+        try {
+            const response = await this.databases.createDocument(
+                conf.appwriteDatabaseID,
+                conf.appwriteSettingsCollectionID,
+                userId,
+                {
+                    theme: "light",
+                    wallpaper: "default",
+                    fontsize: ""
+                }
+            )
+           return response;
+        } catch (error) {
+            console.log("Appwrite service :: createSettings :: error", error.message)
+        }
+    }
+
     async getSettings(userId){
         try {
             const response = await this.databases.getDocument(
                 conf.appwriteDatabaseID,
                 conf.appwriteSettingsCollectionID,
                 userId
-            )
-            return response
+            );
+            return response;
         } catch (error) {
             console.log("Appwrite service :: getSettings :: error", error.message)
         }

@@ -11,6 +11,8 @@ import settingServices from "../../appwrite/settingServices";
 
 function SettingPanel() {
   const userProfile = useSelector((state) => state.userprofile.userProfile);
+  const chatSettings = useSelector(state => state.settings)
+
   const dispatch = useDispatch();
   const inputRef = useRef(null);
   const fontsizesliderRef = useRef(null);
@@ -29,6 +31,9 @@ function SettingPanel() {
   const handleInputChange = async () => {
     const file = inputRef.current.files[0];
     setWallpaperFile(file?.name);
+  };
+  const handleUploadWallpaper = async () => {
+    const file = inputRef.current.files[0];
     await storageServices
       .uploadFile({
         fileID: ID.unique(),
@@ -43,7 +48,7 @@ function SettingPanel() {
         });
       });
     setWallpaperFile("");
-  };
+  }
 
   const handleThemeSettings = async (theme) => {
     dispatch(setChatTheme(theme));
@@ -115,7 +120,7 @@ function SettingPanel() {
                     Select Theme
                   </p>
                   <p className={styles.theme_btn_header_theme_indicator}>
-                    Light
+                    {chatSettings?.chatTheme}
                   </p>
                   <span
                     className="material-symbols-outlined"
@@ -125,11 +130,11 @@ function SettingPanel() {
                   </span>
                 </div>
                 <div className={styles.theme_btn_container}>
-                  <button onClick={() => handleThemeSettings("light")}>
+                  <button onClick={() => handleThemeSettings("Light")}>
                     Light
                   </button>
-                  <button>Dark</button>
-                  <button>System</button>
+                  <button onClick={() => handleThemeSettings("Dark")}>Dark</button>
+                  <button onClick={() => handleThemeSettings("System")}>System</button>
                 </div>
               </div>
             )}
@@ -170,7 +175,7 @@ function SettingPanel() {
                     <p className={styles.wallpaper_file_name}>
                       {wallpaperFile}
                     </p>
-                    <button>Upload Wallpaper</button>
+                    <button onClick={handleUploadWallpaper}>Upload Wallpaper</button>
                   </div>
                 </div>
               </div>

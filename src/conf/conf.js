@@ -5,6 +5,7 @@ const conf = {
     appwriteMessagesCollectionID: String(import.meta.env.VITE_APP_MESSAGES_COLLECTION_ID),
     appwriteUsersCollectionID: String(import.meta.env.VITE_APP_USERS_COLLECTION_ID),
     appwriteRelationshipCollectionID: String(import.meta.env.VITE_APP_RELATIONSHIP_COLLECTION_ID),
+    appwriteSettingsCollectionID: String(import.meta.env.VITE_APP_SETTINGS_COLLECTION_ID),
     appwriteBucketID: String(import.meta.env.VITE_APP_BUCKET_ID)
 }
 

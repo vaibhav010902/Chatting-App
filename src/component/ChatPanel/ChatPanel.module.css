@@ -18,6 +18,11 @@
     position: relative;
     right: 0;
     background-color: rgb(245, 245, 245);
+    /* background-image: url("https://i.pinimg.com/736x/61/58/6d/61586ddd738db8da7329908069b39bb1.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center; */
+    
 }
 .chat_panel_header_container{
     width: 100%;
@@ -162,7 +167,7 @@
 .chat_input_container{
     width: 100%;
     padding: 0px 20px;
-    background-color: rgb(245, 245, 245);
+    /* background-color: rgb(245, 245, 245); */
 }
 .chat_input_main_container{
     width: 100%;

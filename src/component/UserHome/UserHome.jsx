@@ -14,6 +14,8 @@ import {useDispatch} from "react-redux";
 import { setUnreadByUser } from "../../store/messageStatusSlice.js";
 import { addProfile } from "../../store/userProfileSlice.js";
 import ContactProfilePanel from "../../sidebar_panels/ContactProfilePanel/ContactProfilePanel.jsx";
+import settingServices from "../../appwrite/settingServices.js";
+import { setSettings } from "../../store/settingSlice.js";
 
 
 function UserHome() {
@@ -29,7 +31,9 @@ function UserHome() {
   const [requestList, setRequestList] = useState([]);
   const [newMessages, setNewMessages] = useState([]);
   const [unseenMsg, setUnseenMsg] = useState([]);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
+
 
 
   const panels = [
@@ -144,6 +148,26 @@ function UserHome() {
   }, [users, userProfile]);
   
   useEffect(() => {
+    if (!userProfile?.$id) return;
+    const getSettings = async () => {
+      try {
+        setError("")
+        const response = await settingServices.getSettings(userProfile?.$id);
+        if(response){
+          dispatch(setSettings({theme: response?.theme, wallpaper: response?.wallpaper, fontsize: response?.fontsize}))
+        }else{
+          const settings = await settingServices.createSettings(userProfile?.$id);
+          dispatch(setSettings({theme: settings?.theme, wallpaper: settings?.wallpaper, fontsize: settings?.fontsize}))
+        }
+      } catch (error) {
+        
+        setError(error.message);
+      }
+    }
+    getSettings();
+  }, [userProfile?.$id])
+
+  useEffect(() => {
     if (
       Array.isArray(friends) &&
       Array.isArray(users) &&
@@ -189,8 +213,8 @@ function UserHome() {
               requestList={requestList}
               newMessages={newMessages.length}
             />
-            {/* {activePanelComponent} */}
-            <SettingPanel/>
+            {activePanelComponent}
+            {/* <SettingPanel/> */}
             {currentChat?.$id && (
               <ChatPanel
                 currentChat={currentChat}

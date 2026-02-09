@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     chatTheme: "light",
-    chatWallpaper: "",
+    chatWallpaper: null,
     fontSize: "",
 }
 
@@ -10,6 +10,11 @@ const settingSlice = createSlice({
     name: "settings",
     initialState,
     reducers: {
+        setSettings: (state, action) => {
+            state.chatTheme= action.payload.theme,
+            state.chatWallpaper = action.payload.wallpaper,
+            state.fontSize= action.payload.fontsize
+        },
         setChatTheme: (state,action) => {
             state.chatTheme = action.payload
         },
@@ -22,5 +27,5 @@ const settingSlice = createSlice({
     }
 })
 
-export const {setChatTheme, setChatWallpaper, setFontSize} = settingSlice.actions;
+export const {setSettings, setChatTheme, setChatWallpaper, setFontSize} = settingSlice.actions;
 export default settingSlice.reducer;
