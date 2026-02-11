@@ -47,7 +47,11 @@ function ChatPanel({ currentChat, setCurrentChat}) {
   const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
   const userProfile = useSelector(state => state.userprofile.userProfile);
   const userSettings = useSelector(state => state.settings)
-  console.log(userSettings)
+  const chatPanelRef = useRef(null);
+  if(currentChat && chatPanelRef.current?.clientWidth < 769){
+    chatPanelRef.current.style.position = "absolute";
+  }
+  // console.log(userSettings)
 
   // const dispatch = useDispatch();
   // const messages = useSelector((state) => state.chat.messages);
@@ -378,6 +382,8 @@ function ChatPanel({ currentChat, setCurrentChat}) {
     }
   }, [messages]);
 
+  
+
   return (
     <div className={styles.chat_panel_container} 
           style={{backgroundImage: userSettings?.chatWallpaper && `url(${userSettings?.chatWallpaper})`,
@@ -385,6 +391,7 @@ function ChatPanel({ currentChat, setCurrentChat}) {
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat"
           }}
+          ref={chatPanelRef}
     >
       <div className={styles.chat_panel_header_container}>
         <div className={styles.chat_panel_header_container_1}>

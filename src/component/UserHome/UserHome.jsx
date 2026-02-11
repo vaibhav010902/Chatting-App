@@ -45,7 +45,7 @@ function UserHome() {
     {
       name: "Friends",
       component: (
-        <ChatContact friends={friends} setCurrentChat={setCurrentChat} unseenMsg={unseenMsg}/>
+        <ChatContact friends={friends} currentChat={currentChat} setCurrentChat={setCurrentChat} unseenMsg={unseenMsg}/>
       ),
       status: true,
     },

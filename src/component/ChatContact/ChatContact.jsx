@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./ChatContact.module.css";
 import ContactTile from "../ContactTile/ContactTile";
 import Sidebar from "../Sidebar/Sidebar";
@@ -14,13 +14,14 @@ import relationshipServices from "../../appwrite/relationshipServices";
 import NavbarMobileView from "../NavbarMobileView/NavbarMobileView";
 import { setActivePanel } from "../../store/activePanelSlice";
 
-function ChatContact({ friends, setCurrentChat, unseenMsg }) {
+function ChatContact({ friends,currentChat , setCurrentChat, unseenMsg }) {
   const [text, setText] = useState("");
   const [filterUser, setFilterUser] = useState(friends);
   const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const msgUnreadByUser = useSelector(state => state.messageStatus.unreadByUser);
+  const chatContactRef = useRef(null);
   // console.log(friends,filterUser);    // THIS HELPS ME TO IDENTIFY THE BUG
 
   useEffect(() => {
@@ -75,9 +76,14 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
     )
   };
 
+  // if(currentChat && chatContactRef.current?.clientWidth < 769){
+  //   chatContactRef.current.style.display = "none";
+  // }
+
+
   return (
     <>
-      <div className={styles.chatcontact}>
+      <div className={styles.chatcontact} ref={chatContactRef} >
         <div className={styles.chatcontact_container}>
           <div className={styles.chatcontact_header_container}>
             <h1>Friends-Circle</h1>
