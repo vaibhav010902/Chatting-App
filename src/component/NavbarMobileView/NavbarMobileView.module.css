@@ -1,0 +1,41 @@
+.btn_container{
+    /* border: 1px solid black; */
+    width: 100%;
+    padding: 0px 15px;
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+}
+.chat_btn_container, .contact_btn_container, .group_btn_container, .request_btn_container{
+    width: 100%;
+    text-align: center;
+    position: relative;
+    padding: 8px 0px;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+.chat_btn_container:hover, .contact_btn_container:hover, .group_btn_container:hover, .request_btn_container:hover{
+    border-bottom: 2px solid black;
+}
+.chat_btn, .contact_btn, .group_btn, .request_btn{
+    font-size: 15px;
+    font-weight: 400;
+}
+.notification_indicator{
+    position: absolute;
+    font-size: 8px;
+    font-weight: bold;
+    right: 3px;
+    top: 3px;
+    padding: 2px;
+    border-radius: 50%;
+    text-align: center;
+    background-color: rgb(245,245,245);
+}
+
+@media (max-width: 768px) {
+    .btn_container{
+        display: flex;
+    }
+}

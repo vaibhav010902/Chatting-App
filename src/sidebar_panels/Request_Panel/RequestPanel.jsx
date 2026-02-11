@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./Request.module.css";
 import { ContactTile, Loading } from "../../component";
 import { useSelector } from "react-redux";
+import NavbarMobileView from "../../component/NavbarMobileView/NavbarMobileView";
 
 function RequestPanel({users, setCurrentChat, requestList }) {
   const userProfile = useSelector(state => state.userprofile.userProfile);
@@ -9,6 +10,7 @@ function RequestPanel({users, setCurrentChat, requestList }) {
   const [filterUser, setFilterUser] = useState([]);
   const [friendRequest, setFriendRequest] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
 
   useEffect(() => {
     requestList.length==0 && setLoading(false);
@@ -39,21 +41,41 @@ function RequestPanel({users, setCurrentChat, requestList }) {
     setFilterUser(fuser);
   }, [text,friendRequest]);
 
+  const handleLogoutBtn = async () => {
+    try {
+      await authServices.logoutAccount()
+      dispatch(logout())
+      navigate("/")
+    } catch (error) {
+      console.log("error: ",error);
+    }
+  }
+
   return (
     <>
       <div className={styles.chatcontact}>
          <div className={styles.chatcontact_container}>
-          <div className={styles.chatcontact_header_container}>
-            <h1>Friend-Circle</h1>
+         <div className={styles.chatcontact_header_container}>
+            <h1>Friends-Circle</h1>
+            <span 
+              className="material-symbols-outlined"
+              onClick={() => setHamburgerMenuVisibility(prev => !prev)}
+            >more_vert</span>
+            {hamburgerMenuVisibility && 
+            <div className={styles.hamburger_menu_panel}>
+              <p onClick={() => dispatch(setActivePanel("Profile"))}>Profile</p>
+              <p onClick={() => dispatch(setActivePanel("Settings"))}>Settings</p>
+              <p onClick={handleLogoutBtn}>Logout</p>
+            </div>}
           </div>
           <div className={styles.chatcontact_search_bar_container}>
             <input
               type="text"
               placeholder="Search"
-              value={text}
               onChange={(e) => setText(e.target.value)}
             />
           </div>
+          <NavbarMobileView/>
           {loading ?
             <Loading font_Size="20px"/>:
             <div className={styles.chatcontact_chats_container}>

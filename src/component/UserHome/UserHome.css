@@ -9,6 +9,8 @@
 @media (max-width: 768px) {
     .userhome-page {
       grid-template-columns: 1fr;
+      width: 100%;
+      margin: 0;
     }
   
     .chatcontact {

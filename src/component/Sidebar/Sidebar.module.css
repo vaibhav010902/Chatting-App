@@ -119,3 +119,9 @@
     background-color: rgb(245, 245, 245);
     scale: 0.97;
 }
+
+@media (max-width: 768px) {
+    .navbar{
+        display: none;
+    }
+}

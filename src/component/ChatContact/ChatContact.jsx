@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import messagesService from "../../appwrite/messagesService";
 import { resetUnreadByUser } from "../../store/messageStatusSlice";
 import relationshipServices from "../../appwrite/relationshipServices";
+import NavbarMobileView from "../NavbarMobileView/NavbarMobileView";
+import { setActivePanel } from "../../store/activePanelSlice";
 
 function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   const [text, setText] = useState("");
@@ -78,18 +80,15 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
       <div className={styles.chatcontact}>
         <div className={styles.chatcontact_container}>
           <div className={styles.chatcontact_header_container}>
-            <h1>Friend-Circle</h1>
+            <h1>Friends-Circle</h1>
             <span 
               className="material-symbols-outlined"
               onClick={() => setHamburgerMenuVisibility(prev => !prev)}
             >more_vert</span>
             {hamburgerMenuVisibility && 
             <div className={styles.hamburger_menu_panel}>
-              <p onClick={handleProfileBtn}>Profile</p>
-              <p onClick={handleContactBtn}>New Contact</p>
-              <p onClick={handleRequestBtn}>Request</p>
-              <p onClick={handleGroupBtn}>New Group</p>
-              <p onClick={handleSettingsBtn}>Settings</p>
+              <p onClick={() => dispatch(setActivePanel("Profile"))}>Profile</p>
+              <p onClick={() => dispatch(setActivePanel("Settings"))}>Settings</p>
               <p onClick={handleLogoutBtn}>Logout</p>
             </div>}
           </div>
@@ -100,6 +99,7 @@ function ChatContact({ friends, setCurrentChat, unseenMsg }) {
               onChange={(e) => setText(e.target.value)}
             />
           </div>
+          <NavbarMobileView/>
           <div className={styles.chatcontact_chat_filter_container}>
             <span>All</span>
             <span>Unread</span>

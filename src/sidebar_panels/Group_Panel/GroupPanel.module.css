@@ -25,6 +25,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 8px;
+    position: relative;
 }
 .chatcontact_header_container h1{
     font-size: 27px;
@@ -49,6 +50,45 @@
 .chatcontact_search_bar_container input::placeholder{
     color: gray;
     font-size: 14px;
+}
+
+.chatcontact_header_container span{
+    position: relative;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px;
+}
+.chatcontact_header_container span:hover{
+    transform: scale(0.95);
+    background-color: rgb(245,245,245);
+}
+.hamburger_menu_panel{
+    width: 180px;
+    /* height: 100px; */
+    background-color: white;
+    /* border: 1px solid black; */
+    border-radius: 8px;
+    box-shadow: 0px 6px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 5px;
+    position: absolute;
+    top: 130%;
+    right: 1%;
+    z-index: 100;
+}
+.hamburger_menu_panel p{
+    font-size: 14px;
+    width: 100%;
+    text-align:start;
+    padding: 10px 0px 10px 15px;
+    border-radius: 5px;
+}
+.hamburger_menu_panel p:hover{
+    cursor: pointer;
+    background-color: rgb(245,245,245);
 }
 
 .chatcontact_chat_filter_container{

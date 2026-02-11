@@ -33,7 +33,7 @@ function Sidebar({requestList, newMessages }) {
               </span>
             </div>
             <div className={styles.btns_container}>
-              <div>
+              <div className={styles.btn_container_chat}>
               {unreadMsg > 0 && <p>{unreadMsg}</p>}
                 <span
                   className="material-symbols-outlined"
