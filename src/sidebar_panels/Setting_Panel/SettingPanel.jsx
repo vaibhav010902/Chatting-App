@@ -10,24 +10,15 @@ import { setChatTheme, setChatWallpaper } from "../../store/settingSlice";
 import settingServices from "../../appwrite/settingServices";
 import FontSizeSlider from "./FontSizeSlider/FontSizeSlider";
 
+
 function SettingPanel() {
   const userProfile = useSelector((state) => state.userprofile.userProfile);
   const chatSettings = useSelector(state => state.settings)
+  const previousPanel = useSelector(state => state.activePanel.previous);
 
   const dispatch = useDispatch();
   const inputRef = useRef(null);
-  const fontsizesliderRef = useRef(null);
-  const sFontSizeRef = useRef(null);
-  const xsFontSizeLineRef = useRef(null);
-  const xsFontSizeRef = useRef(null);
-  const mFontSizeLineRef = useRef(null);
-  const mFontSizeRef = useRef(null);
-  const xmFontSizeLineRef = useRef(null);
-  const xmFontSizeRef = useRef(null);
-  const lFontSizeLineRef = useRef(null);
-  const lFontSizeRef = useRef(null);
-  const xlFontSizeLineRef = useRef(null);
-  const xlFontSizeRef = useRef(null);
+
 
   const [show, setShow] = useState("");
   const [wallpaperFile, setWallpaperFile] = useState(null);
@@ -80,91 +71,19 @@ function SettingPanel() {
     });
     setShow("");
   };
-  const handleSFontSizeBtn = () => {
-    sFontSizeRef.current.style.backgroundColor = "black";
-    xsFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xsFontSizeRef.current.style.backgroundColor = "#fff";
-    mFontSizeLineRef.current.style.backgroundColor = "#fff";
-    mFontSizeRef.current.style.backgroundColor = "#fff";
-    xmFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xmFontSizeRef.current.style.backgroundColor = "#fff";
-    lFontSizeLineRef.current.style.backgroundColor = "#fff";
-    lFontSizeRef.current.style.backgroundColor = "#fff";
-    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xlFontSizeRef.current.style.backgroundColor = "#fff";
-  }
-  const handleXSFontSizeBtn = () => {
-    sFontSizeRef.current.style.backgroundColor = "black";
-    xsFontSizeLineRef.current.style.backgroundColor = "black";
-    xsFontSizeRef.current.style.backgroundColor = "black";
-    mFontSizeLineRef.current.style.backgroundColor = "#fff";
-    mFontSizeRef.current.style.backgroundColor = "#fff";
-    xmFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xmFontSizeRef.current.style.backgroundColor = "#fff";
-    lFontSizeLineRef.current.style.backgroundColor = "#fff";
-    lFontSizeRef.current.style.backgroundColor = "#fff";
-    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xlFontSizeRef.current.style.backgroundColor = "#fff";
-  }
-  const handleMFontSizeBtn = () => {
-    sFontSizeRef.current.style.backgroundColor = "black";
-    xsFontSizeLineRef.current.style.backgroundColor = "black";
-    xsFontSizeRef.current.style.backgroundColor = "black";
-    mFontSizeLineRef.current.style.backgroundColor = "black";
-    mFontSizeRef.current.style.backgroundColor = "black";
-    xmFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xmFontSizeRef.current.style.backgroundColor = "#fff";
-    lFontSizeLineRef.current.style.backgroundColor = "#fff";
-    lFontSizeRef.current.style.backgroundColor = "#fff";
-    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xlFontSizeRef.current.style.backgroundColor = "#fff";
-  }
-  const handleXMFontSizeBtn = () => {
-    sFontSizeRef.current.style.backgroundColor = "black";
-    xsFontSizeLineRef.current.style.backgroundColor = "black";
-    xsFontSizeRef.current.style.backgroundColor = "black";
-    mFontSizeLineRef.current.style.backgroundColor = "black";
-    mFontSizeRef.current.style.backgroundColor = "black";
-    xmFontSizeLineRef.current.style.backgroundColor = "black";
-    xmFontSizeRef.current.style.backgroundColor = "black";
-    lFontSizeLineRef.current.style.backgroundColor = "#fff";
-    lFontSizeRef.current.style.backgroundColor = "#fff";
-    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xlFontSizeRef.current.style.backgroundColor = "#fff";
-  }
-  const handleLFontSizeBtn = () => {
-    sFontSizeRef.current.style.backgroundColor = "black";
-    xsFontSizeLineRef.current.style.backgroundColor = "black";
-    xsFontSizeRef.current.style.backgroundColor = "black";
-    mFontSizeLineRef.current.style.backgroundColor = "black";
-    mFontSizeRef.current.style.backgroundColor = "black";
-    xmFontSizeLineRef.current.style.backgroundColor = "black";
-    xmFontSizeRef.current.style.backgroundColor = "black";
-    lFontSizeLineRef.current.style.backgroundColor = "black";
-    lFontSizeRef.current.style.backgroundColor = "black";
-    xlFontSizeLineRef.current.style.backgroundColor = "#fff";
-    xlFontSizeRef.current.style.backgroundColor = "#fff";
-  }
-  const handleXLFontSizeBtn = () => {
-    sFontSizeRef.current.style.backgroundColor = "black";
-    xsFontSizeLineRef.current.style.backgroundColor = "black";
-    xsFontSizeRef.current.style.backgroundColor = "black";
-    mFontSizeLineRef.current.style.backgroundColor = "black";
-    mFontSizeRef.current.style.backgroundColor = "black";
-    xmFontSizeLineRef.current.style.backgroundColor = "black";
-    xmFontSizeRef.current.style.backgroundColor = "black";
-    lFontSizeLineRef.current.style.backgroundColor = "black";
-    lFontSizeRef.current.style.backgroundColor = "black";
-    xlFontSizeLineRef.current.style.backgroundColor = "black";
-    xlFontSizeRef.current.style.backgroundColor = "black";
-  }
+
 
   return (
     <>
       <div className={styles.settings_panel}>
         <div className={styles.settings_panel_container}>
           <div className={styles.settings_panel_header_container}>
-            <h1>Settings</h1>
+            <div className={styles.container_1}>
+              <span className="material-symbols-outlined" onClick={() => {
+                dispatch(setActivePanel(previousPanel))
+              }}>arrow_back</span>
+              <h1>Settings</h1>
+            </div>
           </div>
           <div className={styles.settings_panel_profile_container}>
             <div className={styles.settings_panel_profile}>

@@ -48,9 +48,15 @@ function ChatPanel({ currentChat, setCurrentChat}) {
   const userProfile = useSelector(state => state.userprofile.userProfile);
   const userSettings = useSelector(state => state.settings)
   const chatPanelRef = useRef(null);
-  if(currentChat && chatPanelRef.current?.clientWidth < 769){
-    chatPanelRef.current.style.position = "absolute";
-  }
+
+  useEffect(() => {
+    if(currentChat && chatPanelRef.current?.clientWidth < 769){
+      chatPanelRef.current.style.position = "absolute";
+    }
+    if(!currentChat && chatPanelRef.current?.clientWidth < 769){
+      chatPanelRef.current.style.position = "relative";
+    }
+  },[chatPanelRef.current?.clientWidth])
   // console.log(userSettings)
 
   // const dispatch = useDispatch();

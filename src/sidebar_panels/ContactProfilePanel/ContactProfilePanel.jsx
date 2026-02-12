@@ -13,8 +13,8 @@ function ContactProfilePanel() {
   const profile = useSelector((state) => state.userprofile.userProfile);
   const dispatch = useDispatch();
   const previousPanel = useSelector(state => state.activePanel.previous);
-  console.log(previousPanel);
   const [edit, setEdit] = useState(false);
+  
   const { register, handleSubmit } = useForm({
     defaultValues: {
       name: profile?.first_name + " " + profile?.last_name,
@@ -77,7 +77,7 @@ function ContactProfilePanel() {
               <span className="material-symbols-outlined" onClick={() => {
                 dispatch(setActivePanel(previousPanel))
               }}>arrow_back</span>
-              <h1>Friend-Circle</h1>
+              <h1>Friends-Circle</h1>
             </div>
             <span className="material-symbols-outlined">more_vert</span>
           </div>

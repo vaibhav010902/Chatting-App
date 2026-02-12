@@ -26,6 +26,24 @@
     justify-content: space-between;
     margin-bottom: 8px;
 }
+.profile_panel_header_container .container_1{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+}
+.profile_panel_header_container .container_1 span{
+    padding: 5px;
+    border-radius: 50%;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+.profile_panel_header_container .container_1 span:hover{
+    background-color: rgb(245,245,245);
+    transform: scale(0.97);
+}
+
 .profile_panel_header_container h1{
     font-size: 27px;
 }

@@ -5,9 +5,11 @@ import { useForm } from "react-hook-form";
 import profileServices from "../../appwrite/profileServices";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfile } from "../../store/userProfileSlice";
+import { setActivePanel } from "../../store/activePanelSlice";
 
 function ProfilePanel() {
   const profile = useSelector(state => state.userprofile.userProfile);
+  const previousPanel = useSelector(state => state.activePanel.previous);
   const dispatch = useDispatch();
   const [edit, setEdit] = useState(false);
   const { register, handleSubmit } = useForm({
@@ -40,7 +42,12 @@ function ProfilePanel() {
       <div className={styles.profile_panel}>
         <div className={styles.profile_panel_container}>
           <div className={styles.profile_panel_header_container}>
-            <h1>Friend-Circle</h1>
+            <div className={styles.container_1}>
+              <span className="material-symbols-outlined" onClick={() => {
+                dispatch(setActivePanel(previousPanel))
+              }}>arrow_back</span>
+              <h1>Friends-Circle</h1>
+            </div>
           </div>
           <div className={styles.profile_panel_img_container}>
             <img src={profile?.profile_image} alt="" className={styles.user_profile_image} />
