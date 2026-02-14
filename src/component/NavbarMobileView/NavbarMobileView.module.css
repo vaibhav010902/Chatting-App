@@ -14,10 +14,12 @@
     padding: 8px 0px;
     cursor: pointer;
     border: 2px solid transparent;
+    /* background-color: rgb(245, 245, 245); */
+    border-radius: 10px;
 }
-.chat_btn_container:hover, .contact_btn_container:hover, .group_btn_container:hover, .request_btn_container:hover{
-    border-bottom: 2px solid black;
-}
+/* .chat_btn_container:hover, .contact_btn_container:hover, .group_btn_container:hover, .request_btn_container:hover{ */
+    /* border-bottom: 2px solid black; */
+/* } */
 .chat_btn, .contact_btn, .group_btn, .request_btn{
     font-size: 15px;
     font-weight: 400;

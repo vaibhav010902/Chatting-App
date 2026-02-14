@@ -11,37 +11,35 @@ import relationshipServices from "../../appwrite/relationshipServices";
 import NavbarMobileView from "../NavbarMobileView/NavbarMobileView";
 import { setActivePanel } from "../../store/activePanelSlice";
 
-function ChatContact({ friends,currentChat , setCurrentChat, unseenMsg }) {
+function ChatContact({ friends, setCurrentChat, unseenMsg }) {
   const [text, setText] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [filterUser, setFilterUser] = useState(friends);
-  const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const msgUnreadByUser = useSelector(state => state.messageStatus.unreadByUser);
-  const chatContactRef = useRef(null);
   const [allFilterBtn, setAllFilterBtn] = useState(true);
   const [unreadFilterBtn, setUnreadFilterBtn] = useState(false);
-  const [favouritesFilterBtn, setFavouritesFilterBtn] = useState(false);
   const [archivedFilterBtn, setArchivedFilterBtn] = useState(false);
+  const [favouritesFilterBtn, setFavouritesFilterBtn] = useState(false);
+  const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userProfile = useSelector(state => state.userprofile.userProfile);
-  const [isLoading, setIsLoading] = useState(true);
+  const msgUnreadByUser = useSelector(state => state.messageStatus.unreadByUser);
+
+  const chatContactRef = useRef(null);
   
   // console.log(friends,filterUser);    // THIS HELPS ME TO IDENTIFY THE BUG
-  // console.log(unseenMsg)
 
   useEffect(() => {
     let filterFriends = [];
     if(favouritesFilterBtn){
       const favFriends = friends.filter(friend => userProfile?.favourites.includes(friend.$id));
-      // setFilterUser(favFriends);
       filterFriends = favFriends;
     }else if(archivedFilterBtn){
       const archivedFriends = friends.filter(friend => userProfile?.archived.includes(friend.$id));
-      // setFilterUser(archivedFriends);
       filterFriends = archivedFriends;
     }else if(unreadFilterBtn){
       const unreadFriends = friends.filter(friend => unseenMsg.find(msg => msg.senderId === friend.$id));
-      // setFilterUser(unreadFriends);
       filterFriends = unreadFriends;
     }
     else{

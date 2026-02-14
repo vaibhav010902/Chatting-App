@@ -4,14 +4,14 @@ import { ContactTile, Loading } from "../../component";
 import { useSelector } from "react-redux";
 import NavbarMobileView from "../../component/NavbarMobileView/NavbarMobileView";
 
-function RequestPanel({users, setCurrentChat, requestList }) {
+function RequestPanel({users, setCurrentChat}) {
   const userProfile = useSelector(state => state.userprofile.userProfile);
   const [text, setText] = useState("");
   const [filterUser, setFilterUser] = useState([]);
   const [friendRequest, setFriendRequest] = useState([]);
   const [loading, setLoading] = useState(true);
   const [hamburgerMenuVisibility, setHamburgerMenuVisibility] = useState(false);
-
+  const requestList = useSelector(state => state.requestlist.requestList);
   useEffect(() => {
     requestList.length==0 && setLoading(false);
   }, [userProfile.$id]);

@@ -6,11 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout as authLogout } from "../../store/authSlice";
 import { setActivePanel } from "../../store/activePanelSlice";
 
-function Sidebar({requestList, newMessages }) {
+function Sidebar({ newMessages }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const unreadMsg = useSelector((state) => state.messageStatus.totalUnread);
   const activePanel = useSelector((state) => state.activePanel.name);
+  const requestList = useSelector(state => state.requestlist.requestList);
+  
   return (
     <>
       <nav className={styles.navbar}>

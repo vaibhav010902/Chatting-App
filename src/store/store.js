@@ -5,6 +5,7 @@ import messageStatusReducer from './messageStatusSlice'
 import userProfileReducer from './userProfileSlice'
 import activePanelReducer from './activePanelSlice'
 import settingsReducer from './settingSlice'
+import requestListReducer from './requestListSlice'
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         userprofile: userProfileReducer,
         activePanel: activePanelReducer,
         settings: settingsReducer,
+        requestlist: requestListReducer
     }
 })
 

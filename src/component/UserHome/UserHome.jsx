@@ -16,7 +16,7 @@ import { addProfile } from "../../store/userProfileSlice.js";
 import ContactProfilePanel from "../../sidebar_panels/ContactProfilePanel/ContactProfilePanel.jsx";
 import settingServices from "../../appwrite/settingServices.js";
 import { setSettings } from "../../store/settingSlice.js";
-
+import { setRequestList } from "../../store/requestListSlice.js";
 
 function UserHome() {
   const userData = useSelector((state) => state.auth.userData);
@@ -25,11 +25,9 @@ function UserHome() {
 
   const [loading, setLoading] = useState(true);
   const [currentChat, setCurrentChat] = useState("");
-  // const [activePanel, setActivePanel] = useState("Friends");
   const [users, setUsers] = useState([]);
   const [friends, setFriends] = useState(null);
-  const [requestList, setRequestList] = useState([]);
-  const [newMessages, setNewMessages] = useState([]);
+  // const [newMessages, setNewMessages] = useState([]);
   const [unseenMsg, setUnseenMsg] = useState([]);
   const [error, setError] = useState("");
   const dispatch = useDispatch();
@@ -45,7 +43,7 @@ function UserHome() {
     {
       name: "Friends",
       component: (
-        <ChatContact friends={friends} currentChat={currentChat} setCurrentChat={setCurrentChat} unseenMsg={unseenMsg}/>
+        <ChatContact friends={friends} setCurrentChat={setCurrentChat} unseenMsg={unseenMsg}/>
       ),
       status: true,
     },
@@ -61,7 +59,7 @@ function UserHome() {
     },
     {
       name: "Requests",
-      component: <RequestPanel users={users} setCurrentChat={setCurrentChat} requestList={requestList}/>,
+      component: <RequestPanel users={users} setCurrentChat={setCurrentChat}/>,
       status: false,
     },
     {
@@ -85,11 +83,9 @@ function UserHome() {
       if (!userData?.$id) return;
       try {
         const response = await profileServices.getProfile(userData.$id);
-        // setUserProfile(response.documents[0]);
         dispatch(addProfile(response.documents[0]))
       } catch (error) {
         console.log("Error fetching profile:", error.message);
-        // setUserProfile(null);
       } finally {
         setLoading(false);
       }
@@ -118,7 +114,7 @@ function UserHome() {
 
     try{
       const response = await relationshipServices.getRelationshipList({toUserId: userProfile?.$id, status: "pending"});
-      response.length && setRequestList(response);
+      response.length && dispatch(setRequestList(response));
     }catch(error){
       console.log("UserHome :: getFriendRequestList :: ", error.message);
     }
@@ -209,17 +205,13 @@ function UserHome() {
       ) : (
         <>
           <div className="userhome-page">
-            <Sidebar
-              requestList={requestList}
-              newMessages={newMessages.length}
-            />
+            <Sidebar/>
             {activePanelComponent}
             {/* <SettingPanel/> */}
             {currentChat?.$id && (
               <ChatPanel
                 currentChat={currentChat}
                 setCurrentChat={setCurrentChat}
-                unseenMsg={unseenMsg}
               />
             )}
           </div>
