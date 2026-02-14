@@ -1,13 +1,11 @@
 import { useEffect } from "react";
-import { useDispatch,useSelector } from "react-redux";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Outlet } from "react-router-dom";
 import authServices from "./appwrite/auth";
 import { login, logout, setAuthChecked } from "./store/authSlice";
-import profileServices from "./appwrite/profileServices";
 
 function App() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const restoreSession = async () => {

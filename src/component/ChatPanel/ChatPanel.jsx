@@ -3,11 +3,9 @@ import styles from "./ChatPanel.module.css";
 import MessageTile from "../MessageTile/MessageTile";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {setActiveChat, loadLocalMessages, addMessage} from "../../store/chatSlice";
 import messagesService from "../../appwrite/messagesService";
 import { ID } from "appwrite";
 import conf from "../../conf/conf";
-import { realtime } from "../../appwrite/config";
 import profileServices from "../../appwrite/profileServices";
 import { client } from "../../appwrite/config";
 import data from "@emoji-mart/data";
@@ -57,26 +55,7 @@ function ChatPanel({ currentChat, setCurrentChat}) {
       chatPanelRef.current.style.position = "relative";
     }
   },[chatPanelRef.current?.clientWidth])
-  // console.log(userSettings)
-
-  // const dispatch = useDispatch();
-  // const messages = useSelector((state) => state.chat.messages);
-
-  //   useEffect(() => {
-  //     dispatch(setActiveChat(getConversationId()));
-  //     dispatch(loadLocalMessages(getConversationId()));
-  //   }, [currentChat]);
-
-  //   const sendMessage = async (text) => {
-  //     const message = {
-  //       id: crypto.randomUUID(),
-  //       chatId,
-  //       senderId: "currentUserId",
-  //       content: text,
-  //       createdAt: new Date().toISOString(),
-  //     };
-
-  //     dispatch(addMessage(message));
+  
 
   const getConversationId = () => {
     return [userData.$id, currentChat?.$id].sort().join("-");
