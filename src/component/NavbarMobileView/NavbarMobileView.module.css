@@ -24,14 +24,15 @@
 }
 .notification_indicator{
     position: absolute;
-    font-size: 8px;
+    font-size: 9px;
     font-weight: bold;
     right: 3px;
     top: 3px;
-    padding: 2px;
+    padding: 2px 4px;
     border-radius: 50%;
     text-align: center;
-    background-color: rgb(245,245,245);
+    color: white;
+    background-color: #ee2c2c;
 }
 
 @media (max-width: 768px) {

@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./ChatContact.module.css";
 import ContactTile from "../ContactTile/ContactTile";
-import Sidebar from "../Sidebar/Sidebar";
-import ChatPanel from "../ChatPanel/ChatPanel";
-import Loading from "../Loading/Loading";
 import authServices from "../../appwrite/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/authSlice";
@@ -22,35 +19,70 @@ function ChatContact({ friends,currentChat , setCurrentChat, unseenMsg }) {
   const navigate = useNavigate();
   const msgUnreadByUser = useSelector(state => state.messageStatus.unreadByUser);
   const chatContactRef = useRef(null);
+  const [allFilterBtn, setAllFilterBtn] = useState(true);
+  const [unreadFilterBtn, setUnreadFilterBtn] = useState(false);
+  const [favouritesFilterBtn, setFavouritesFilterBtn] = useState(false);
+  const [archivedFilterBtn, setArchivedFilterBtn] = useState(false);
+  const userProfile = useSelector(state => state.userprofile.userProfile);
+  const [isLoading, setIsLoading] = useState(true);
+  
   // console.log(friends,filterUser);    // THIS HELPS ME TO IDENTIFY THE BUG
+  // console.log(unseenMsg)
 
   useEffect(() => {
-    friends = friends?.filter(
+    let filterFriends = [];
+    if(favouritesFilterBtn){
+      const favFriends = friends.filter(friend => userProfile?.favourites.includes(friend.$id));
+      // setFilterUser(favFriends);
+      filterFriends = favFriends;
+    }else if(archivedFilterBtn){
+      const archivedFriends = friends.filter(friend => userProfile?.archived.includes(friend.$id));
+      // setFilterUser(archivedFriends);
+      filterFriends = archivedFriends;
+    }else if(unreadFilterBtn){
+      const unreadFriends = friends.filter(friend => unseenMsg.find(msg => msg.senderId === friend.$id));
+      // setFilterUser(unreadFriends);
+      filterFriends = unreadFriends;
+    }
+    else{
+        filterFriends = friends;
+    }
+    filterFriends = filterFriends?.filter(
       (friend) =>
         friend.first_name.toLowerCase().includes(text.toLowerCase()) ||
         friend.last_name.toLowerCase().includes(text.toLowerCase())
     );
-    setFilterUser(friends);
-  }, [text, friends]); // BUG FIXED BY ADDING FRIENDS ARRAY IN USEEFFECT DEPENDENCY ARRAY
+    setFilterUser(filterFriends);
+    
+  }, [text, friends, favouritesFilterBtn, archivedFilterBtn, allFilterBtn]); // BUG FIXED BY ADDING FRIENDS ARRAY IN USEEFFECT DEPENDENCY ARRAY
 
-  const handleProfileBtn = async () => {
-    console.log("Profile Btn Clicked")
+  const handleAllFilterBtn = async () => {
+    setAllFilterBtn(prev => !prev)
+    setUnreadFilterBtn(false)
+    setFavouritesFilterBtn(false)
+    setArchivedFilterBtn(false)
+    setFilterUser(friends) // BUG FIXED BY ADDING FRIENDS ARRAY IN USEEFFECT DEPENDENCY ARRAY SO THAT FILTERUSER ARRAY WILL BE RESETED TO FRIENDS ARRAY WHEN ALL BUTTON IS PRESSED
   }
 
-  const handleContactBtn = async () => {
-    console.log("Contact Btn Clicked")
+  const handleUnreadFilterBtn = async () => {
+    setUnreadFilterBtn(prev =>!prev)
+    setAllFilterBtn(false)
+    setFavouritesFilterBtn(false)
+    setArchivedFilterBtn(false)
   }
 
-  const handleRequestBtn = () => {
-    console.log("Request Btn Clicked")
+  const handleFavouritesFilterBtn = () => {
+    setFavouritesFilterBtn(prev =>!prev)
+    setAllFilterBtn(false)
+    setUnreadFilterBtn(false)
+    setArchivedFilterBtn(false)
   }
 
-  const handleGroupBtn = () => {
-    console.log("Group Btn Clicked")
-  }
-
-  const handleSettingsBtn = () => {
-    console.log("Settings Btn Clicked")
+  const handleArchivedFilterBtn = () => {
+    setArchivedFilterBtn(prev => !prev)
+    setAllFilterBtn(false)
+    setUnreadFilterBtn(false)
+    setFavouritesFilterBtn(false)
   }
 
   const handleLogoutBtn = async () => {
@@ -75,11 +107,6 @@ function ChatContact({ friends,currentChat , setCurrentChat, unseenMsg }) {
     }
     )
   };
-
-  // if(currentChat && chatContactRef.current?.clientWidth < 769){
-  //   chatContactRef.current.style.display = "none";
-  // }
-
 
   return (
     <>
@@ -107,10 +134,22 @@ function ChatContact({ friends,currentChat , setCurrentChat, unseenMsg }) {
           </div>
           <NavbarMobileView/>
           <div className={styles.chatcontact_chat_filter_container}>
-            <span>All</span>
-            <span>Unread</span>
-            <span>Favourites</span>
-            <span>Archived</span>
+            <span 
+              onClick={handleAllFilterBtn}
+              style={{backgroundColor: allFilterBtn? "rgb(245,245,245)":"transparent", scale: allFilterBtn? "0.97":"1"}}
+            >All</span>
+            <span 
+              onClick={handleUnreadFilterBtn}
+              style={{backgroundColor: unreadFilterBtn? "rgb(245,245,245)":"transparent", scale: allFilterBtn? "0.97":"1"}}
+            >Unread</span>
+            <span 
+              onClick={handleFavouritesFilterBtn}
+              style={{backgroundColor: favouritesFilterBtn? "rgb(245,245,245)":"transparent", scale: allFilterBtn? "0.97":"1"}}
+            >Favourites</span>
+            <span 
+              onClick={handleArchivedFilterBtn}
+              style={{backgroundColor: archivedFilterBtn? "rgb(245,245,245)":"transparent", scale: allFilterBtn? "0.97":"1"}}
+            >Archived</span>
           </div>
           <div className={styles.chatcontact_chats_container}>
             {filterUser.length == 0 ? (

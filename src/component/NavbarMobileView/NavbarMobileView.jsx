@@ -5,7 +5,8 @@ import { setActivePanel } from '../../store/activePanelSlice'
 
 function NavbarMobileView() {
     const dispatch = useDispatch();
-    const activePanel = useSelector(state => state.activePanel.name)
+    const activePanel = useSelector(state => state.activePanel.name);
+    const unreadMsg = useSelector(state => state.messageStatus.totalUnread);
 
     return (
         <>
@@ -15,7 +16,7 @@ function NavbarMobileView() {
                     onClick={() => dispatch(setActivePanel("Friends"))}
                     style={{borderBottom: activePanel === "Friends"? "2px solid black" : "none"}}
                 >
-                    <p className={styles.notification_indicator}>12</p>
+                    {unreadMsg > 0 && <p className={styles.notification_indicator}>{unreadMsg}</p>}
                     <span className={styles.chat_btn}>Chat</span>
                 </div>
                 <div 
