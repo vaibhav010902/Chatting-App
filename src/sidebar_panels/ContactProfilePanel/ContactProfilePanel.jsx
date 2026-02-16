@@ -1,60 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./ContactProfilePanel.module.css";
-import { Button, ContactTile } from "../../component";
+import { Button, ContactTile, Loading } from "../../component";
 import { useForm } from "react-hook-form";
 import profileServices from "../../appwrite/profileServices";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfile } from "../../store/userProfileSlice";
 import relationshipServices from "../../appwrite/relationshipServices";
 import { ID } from "appwrite";
-import { setActivePanel } from "../../store/activePanelSlice";
+import { setActivePanel} from "../../store/activePanelSlice";
 
 function ContactProfilePanel() {
-  const profile = useSelector((state) => state.userprofile.userProfile);
   const dispatch = useDispatch();
   const previousPanel = useSelector(state => state.activePanel.previous);
-  const [edit, setEdit] = useState(false);
+  const contactId = useSelector(state => state.activePanel.contact_id);
+  const [profile, setProfile] = useState(null);
+  const userProfile = useSelector(state => state.userprofile.userProfile);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await profileServices.getProfile(contactId);
+        setProfile(response.documents[0])
+      } catch (error) {
+        console.error("Select User")
+      }
+    }
+    fetchProfile();
+  })
   
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      name: profile?.first_name + " " + profile?.last_name,
-      email: profile?.email,
-      phone: profile?.phone,
-      dob: profile?.dob.slice(0, 10),
-      status: profile?.status,
-    },
-  });
-
-  const editSubmit = async (data) => {
-    setEdit((prev) => !prev);
-
-    const response = await profileServices.updateProfile({
-      userId: profile.$id,
-      first_name: data.name.split(" ")[0],
-      last_name: data?.name?.split(" ").slice(1).join(" "),
-      email: data.email,
-      phone: data.phone,
-      dob: data.dob,
-      status: data.status,
-    });
-    dispatch(updateProfile(response));
-  };
+  
   async function handleAddToFriend(){
     await relationshipServices.friendRequest({
       relationshipId: ID.unique()+Date.now(),
-      fromUserId: profile.$id,
-      toUserId: "",
+      fromUserId: userProfile.$id,
+      toUserId: profile.$id,
     })
     const response = await profileServices.updateProfile({
-      userId: profile.$id,
-      friends: Array.from(new Set([...profile.friends, ""]))
+      userId: userProfile.$id,
+      friends: Array.from(new Set([...userProfile.friends, profile.$id]))
+    })
+    dispatch(updateProfile(response))
+  }
+  async function handleUnfriend(){
+    await relationshipServices.friendRequest({
+      relationshipId: ID.unique()+Date.now(),
+      fromUserId: userProfile.$id,
+      toUserId: profile.$id,
+    })
+    const response = await profileServices.updateProfile({
+      userId: userProfile.$id,
+      friends: Array.from(new Set([...userProfile.friends, profile.$id]))
     })
     dispatch(updateProfile(response))
   }
   async function handleBlock(){
     await relationshipServices.getRelationshipId({
-      fromUserId: profile.$id,
-      toUserId: "",
+      fromUserId: userProfile.$id,
+      toUserId: profile.$id,
     }).then((res) => {
       relationshipServices.updateRelationship({
         relationshipId: res,
@@ -62,11 +64,47 @@ function ContactProfilePanel() {
       })
     })
     response = await profileServices.updateProfile({
-      userId: profile.$id,
-      block: Array.from(new Set([...profile.block, ""]))
+      userId: userProfile.$id,
+      block: Array.from(new Set([...userProfile.block, profile.$id]))
     })
     dispatch(updateProfile(response))
   }
+
+  const isFriend = userProfile?.friends?.includes(profile?.$id);
+  const isBlocked = userProfile?.block?.includes(profile?.$id);
+
+  const btns = [
+    {
+      name: "Message",
+      icon: "message",
+      function: "",
+      status: true
+    },
+    {
+      name: "Add to Friend",
+      icon: "person_add",
+      function: handleAddToFriend,
+      status: !isFriend
+    },
+    {
+      name: "Unfriend",
+      icon: "person_remove",
+      function: "",
+      status: isFriend
+    },
+    {
+      name: "Block",
+      icon: "person_off",
+      function: handleBlock,
+      status: !isBlocked
+    },
+    {
+      name: "Unblock",
+      icon: "person",
+      function: "",
+      status: isBlocked
+    }
+  ]
 
   return (
     <>
@@ -88,7 +126,8 @@ function ContactProfilePanel() {
               className={styles.user_profile_image}
             />
           </div>
-          <div className={styles.profile_panel_fields_container}>
+          {profile ? 
+          (<div className={styles.profile_panel_fields_container}>
             <div className={styles.field_container}>
               <p className={styles.name}>
                 {profile?.first_name + " " + profile?.last_name}
@@ -107,20 +146,16 @@ function ContactProfilePanel() {
             <p className={styles.dob}>{profile?.dob.slice(0, 10)}</p>
             </div> */}
             <div className={styles.btn_container}>
-              <div className={styles.msg_btn_container}>
-              <span className="material-symbols-outlined">message</span>
-              <p className={styles.msg_btn}>Message</p>
-              </div>
-              <div className={styles.add_to_friend_btn_container}>
-              <span className="material-symbols-outlined">person_add</span>
-              <p className={styles.msg_btn}>Add to Friend</p>
-              </div>
-              <div className={styles.block_btn_container}>
-              <span className="material-symbols-outlined">person_off</span>
-              <p className={styles.msg_btn}>Block</p>
-              </div>
+              {btns.map((btn) => (
+                btn.status && 
+                  <div className={styles.msg_btn_container} onClick={btn.function}>
+                    <span className="material-symbols-outlined">{btn.icon}</span>
+                    <p className={styles.msg_btn}>{btn.name}</p>
+                  </div>
+              ))} 
             </div>
-          </div>
+          </div>) : 
+          (<Loading/>)}
         </div>
       </div>
     </>

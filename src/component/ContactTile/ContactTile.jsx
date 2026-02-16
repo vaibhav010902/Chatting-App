@@ -8,7 +8,7 @@ import ContactProfilePanel from "../../sidebar_panels/ContactProfilePanel/Contac
 import { ID } from "appwrite";
 import { resetUnreadByUser } from "../../store/messageStatusSlice";
 import messagesService from "../../appwrite/messagesService";
-import { setActivePanel } from "../../store/activePanelSlice";
+import { setActivePanel, setActivePanelContactId } from "../../store/activePanelSlice";
 function ContactTile({
   contact_id,
   contact_name,
@@ -48,7 +48,8 @@ function ContactTile({
 
     const handleProfileBtn = async (e) => {
       e.stopPropagation();
-      dispatch(setActivePanel("Contact_Profile_Panel"))
+      dispatch(setActivePanel("Contact_Profile_Panel"));
+      dispatch(setActivePanelContactId(contact_id));
     }
 
     const handleMarkAsReadBtn = async (e) => {

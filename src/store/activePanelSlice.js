@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     name: "Friends",
-    previous: ""
+    previous: "",
+    contact_id: null,
 }
 
 const activePanelSlice = createSlice({
@@ -12,10 +13,13 @@ const activePanelSlice = createSlice({
         setActivePanel: (state, action) => {
             state.previous = state.name;
             state.name = action.payload;
+        },
+        setActivePanelContactId: (state, action) => {
+            state.contact_id = action.payload
         }
     }
 })
 
-export const {setActivePanel} = activePanelSlice.actions;
+export const {setActivePanel, setActivePanelContactId} = activePanelSlice.actions;
 
 export default activePanelSlice.reducer;
