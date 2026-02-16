@@ -12,8 +12,6 @@ import { ID } from "appwrite";
 import settingServices from "../../appwrite/settingServices";
 
 function Profile() {
-  console.log("Inside Profile Component....");
-
   const [error, setError] = useState("");
   const userData = useSelector((state) => state.auth.userData);
   const [loading, setLoading] = useState(true);
