@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import profileServices from "../appwrite/profileServices";
 import Loading from "./Loading/Loading";
-import { Navigate } from "react-router-dom";
 
 function AuthLayout({ children, isAuthenticated = true }) {
   const navigate = useNavigate();

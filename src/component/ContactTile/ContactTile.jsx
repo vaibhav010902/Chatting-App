@@ -46,11 +46,13 @@ function ContactTile({
       }
     },[hamburgerMenuVisibility,setHamburgerMenuVisibility])
 
-    const handleProfileBtn = async () => {
+    const handleProfileBtn = async (e) => {
+      e.stopPropagation();
       dispatch(setActivePanel("Contact_Profile_Panel"))
     }
 
-    const handleMarkAsReadBtn = async () => {
+    const handleMarkAsReadBtn = async (e) => {
+      e.stopPropagation();
       const response = await messagesService.getMessagesSendByUser({
         activeChatId: contact_id, 
         userId: userProfile.$id
@@ -64,14 +66,16 @@ function ContactTile({
       dispatch(resetUnreadByUser(contact_id));
     }
 
-    const handleAddToFavouriteBtn = async () => {
+    const handleAddToFavouriteBtn = async (e) => {
+      e.stopPropagation();
       const response = await profileServices.updateProfile({
         userId: userProfile.$id,
         favourites: [...userProfile.favourites,contact_id]
       })
       dispatch(updateProfile(response))
     }
-    const handleRemoveFromFavouriteBtn = async () => {
+    const handleRemoveFromFavouriteBtn = async (e) => {
+      e.stopPropagation();
       const response = await profileServices.updateProfile({
         userId: userProfile.$id,
         favourites: userProfile.favourites.filter(favouriteId => favouriteId!==contact_id)
@@ -79,7 +83,8 @@ function ContactTile({
       dispatch(updateProfile(response))
     }
 
-    const handleAddToFriendBtn = async () => {
+    const handleAddToFriendBtn = async (e) => {
+      e.stopPropagation();
       await relationshipServices.friendRequest({
         relationshipId: ID.unique() + Date.now(),
         fromUserId: userProfile.$id,
@@ -91,7 +96,8 @@ function ContactTile({
       })
       dispatch(updateProfile(response))
     }
-    const handleUnfriendBtn = async () => {
+    const handleUnfriendBtn = async (e) => {
+      e.stopPropagation();
       await relationshipServices.getRelationshipId({
         fromUserId: userProfile.$id,
         toUserId: contact_id
@@ -108,14 +114,16 @@ function ContactTile({
       dispatch(updateProfile(response))
     }
 
-    const handleArchivedBtn = async () => {
+    const handleArchivedBtn = async (e) => {
+        e.stopPropagation();
         const response = await profileServices.updateProfile({
           userId: userProfile.$id,
           archived: Array.from(new Set([...userProfile.archived,contact_id]))
         })
         dispatch(updateProfile(response))
     }
-    const handleUnarchivedBtn = async () => {
+    const handleUnarchivedBtn = async (e) => {
+        e.stopPropagation();
         const response = await profileServices.updateProfile({
           userId: userProfile.$id,
           archived: userProfile.archived.filter(archivedId => archivedId!==contact_id)
@@ -123,7 +131,8 @@ function ContactTile({
         dispatch(updateProfile(response))
     }
     
-    const handleBlockBtn = async () => {
+    const handleBlockBtn = async (e) => {
+      e.stopPropagation();
       await relationshipServices.getRelationshipId({
         fromUserId: userProfile.$id,
         toUserId: contact_id
@@ -139,7 +148,8 @@ function ContactTile({
       })
       dispatch(updateProfile(response))
     }
-    const handleUnblockBtn = async () => {
+    const handleUnblockBtn = async (e) => {
+      e.stopPropagation();
       await relationshipServices.getRelationshipId({
         fromUserId: userProfile.$id,
         toUserId: contact_id
@@ -244,7 +254,9 @@ function ContactTile({
         </div>
         <div className={styles.contact_tile_btn_container}>
           {status && <p className={styles.indicator}></p>}
-          <span className="material-symbols-outlined" onClick={() => setHamburgerMenuVisibility(prev => !prev)}>more_vert</span>
+          <span className="material-symbols-outlined" onClick={(e) => {
+            e.stopPropagation();
+            setHamburgerMenuVisibility(prev => !prev)}}>more_vert</span>
           {hamburgerMenuVisibility && (
             <div className={styles.hamburger_menu_panel} ref={menuRef}>
               {hamburgerBtns.map(btn => (
