@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import styles from "./ContactProfilePanel.module.css";
 import { Button, ContactTile, Loading } from "../../component";
 import { useForm } from "react-hook-form";
@@ -30,10 +30,17 @@ function ContactProfilePanel() {
   
   
   async function handleAddToFriend(){
-    await relationshipServices.friendRequest({
-      relationshipId: ID.unique()+Date.now(),
+    await relationshipServices.getRelationshipId({
       fromUserId: userProfile?.$id,
-      toUserId: profile?.$id,
+      toUserId: profile?.$id
+    }).then(async (res) => {
+      await relationshipServices.friendRequestAccept(res);
+    }).catch(async (err) => {
+      await relationshipServices.friendRequest({
+        relationshipId: ID.unique()+Date.now(),
+        fromUserId: userProfile?.$id,
+        toUserId: profile?.$id
+      })
     })
     const response = await profileServices.updateProfile({
       userId: userProfile.$id,
@@ -41,6 +48,7 @@ function ContactProfilePanel() {
     })
     dispatch(updateProfile(response))
   }
+  
   async function handleUnfriend(){
     await relationshipServices.getRelationshipId({
       fromUserId: userProfile?.$id,

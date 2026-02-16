@@ -86,11 +86,18 @@ function ContactTile({
 
     const handleAddToFriendBtn = async (e) => {
       e.stopPropagation();
-      await relationshipServices.friendRequest({
+      await relationshipServices.getRelationshipId({
+        fromUserId: userProfile?.$id,
+        toUserId: contact_id
+      }).then(async(res) => {
+        await relationshipServices.friendRequestAccept(res)
+      }).catch(async (err) => {
+        await relationshipServices.friendRequest({
         relationshipId: ID.unique() + Date.now(),
         fromUserId: userProfile.$id,
         toUserId: contact_id,
-      });
+        });
+      })
       const response = await profileServices.updateProfile({
         userId: userProfile.$id,
         friends: Array.from(new Set([...userProfile.friends,contact_id]))
@@ -101,7 +108,7 @@ function ContactTile({
       e.stopPropagation();
       await relationshipServices.getRelationshipId({
       fromUserId: userProfile?.$id,
-      toUserId: profile?.$id
+      toUserId: contact_id
       }).then(async (res) => {
         const response = await relationshipServices.getRelationship({relationshipId: res});
         if(response.status === "pending"){

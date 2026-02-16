@@ -111,6 +111,7 @@ export class RelationshipServices{
     }
 
     async getRelationshipId({fromUserId,toUserId}){
+        console.log("Getting relationship ID for users", fromUserId, toUserId)
         try {
             const response = await this.database.listDocuments(
                 conf.appwriteDatabaseID,
