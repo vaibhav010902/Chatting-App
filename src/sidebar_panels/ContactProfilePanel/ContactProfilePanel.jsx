@@ -83,7 +83,7 @@ function ContactProfilePanel() {
     {
       name: "Add to Friend",
       icon: "person_add",
-      function: handleAddToFriend,
+      function: handleAddToFriend(),
       status: !isFriend
     },
     {
@@ -95,7 +95,7 @@ function ContactProfilePanel() {
     {
       name: "Block",
       icon: "person_off",
-      function: handleBlock,
+      function: handleBlock(),
       status: !isBlocked
     },
     {
