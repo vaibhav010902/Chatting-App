@@ -20,7 +20,7 @@ export class SettingServices{
                 userId,
                 {
                     theme: "light",
-                    wallpaper: "default",
+                    wallpaper: null,
                     fontsize: ""
                 }
             )
