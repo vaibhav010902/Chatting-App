@@ -161,6 +161,18 @@ export class RelationshipServices{
             console.log("Appwrite service :: get request list :: error", error)
         }
     }
+
+    async removeRelationship(relationshipId){
+        try {
+            await this.database.deleteDocument(
+                conf.appwriteDatabaseID,
+                conf.appwriteRelationshipCollectionID,
+                relationshipId
+            )
+        } catch (error) {
+            console.log("Appwrite service :: remove relationship :: error", error)
+        }
+    }
 }
 
 const relationshipServices = new RelationshipServices();

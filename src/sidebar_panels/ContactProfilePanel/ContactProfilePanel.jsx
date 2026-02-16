@@ -32,8 +32,8 @@ function ContactProfilePanel() {
   async function handleAddToFriend(){
     await relationshipServices.friendRequest({
       relationshipId: ID.unique()+Date.now(),
-      fromUserId: userProfile.$id,
-      toUserId: profile.$id,
+      fromUserId: userProfile?.$id,
+      toUserId: profile?.$id,
     })
     const response = await profileServices.updateProfile({
       userId: userProfile.$id,
@@ -45,11 +45,22 @@ function ContactProfilePanel() {
     await relationshipServices.getRelationshipId({
       fromUserId: userProfile?.$id,
       toUserId: profile?.$id
-    }).then((res) => {
-      relationshipServices.updateRelationship({
-        relationshipId: res,
-        status: "pending"
-      })
+    }).then(async (res) => {
+      const response = await relationshipServices.getRelationship({relationshipId: res});
+      if(response.status === "pending"){
+        await relationshipServices.removeRelationship(res)
+        console.log("Relationship removed")
+      }else{
+        await relationshipServices.updateRelationship({
+          relationshipId: res,
+          type: "pending"
+        })
+        console.log("Relationship updated to pending")
+      }
+      // relationshipServices.updateRelationship({
+      //   relationshipId: res,
+      //   status: "pending"
+      // })
     })
     const response = await profileServices.updateProfile({
       userId: userProfile.$id,

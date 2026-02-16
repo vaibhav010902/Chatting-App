@@ -100,13 +100,18 @@ function ContactTile({
     const handleUnfriendBtn = async (e) => {
       e.stopPropagation();
       await relationshipServices.getRelationshipId({
-        fromUserId: userProfile.$id,
-        toUserId: contact_id
-      }).then((res) => {
-        relationshipServices.updateRelationship({
-          relationshipId: res,
-          status: "pending"
-        })
+      fromUserId: userProfile?.$id,
+      toUserId: profile?.$id
+      }).then(async (res) => {
+        const response = await relationshipServices.getRelationship({relationshipId: res});
+        if(response.status === "pending"){
+          await relationshipServices.removeRelationship(res)
+        }else{
+          await relationshipServices.updateRelationship({
+            relationshipId: res,
+            type: "pending"
+          })
+        }
       })
       const response = await profileServices.updateProfile({
         userId: userProfile.$id,
