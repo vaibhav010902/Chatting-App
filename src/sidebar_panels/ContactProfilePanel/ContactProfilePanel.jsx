@@ -67,7 +67,7 @@ function ContactProfilePanel() {
         type: "block"
       })
     })
-    response = await profileServices.updateProfile({
+    const response = await profileServices.updateProfile({
       userId: userProfile.$id,
       block: Array.from(new Set([...userProfile.block, profile.$id]))
     })
