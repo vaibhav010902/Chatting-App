@@ -42,14 +42,18 @@ function ContactProfilePanel() {
     dispatch(updateProfile(response))
   }
   async function handleUnfriend(){
-    await relationshipServices.friendRequest({
-      relationshipId: ID.unique()+Date.now(),
-      fromUserId: userProfile.$id,
-      toUserId: profile.$id,
+    await relationshipServices.getRelationshipId({
+      fromUserId: userProfile?.$id,
+      toUserId: profile?.$id
+    }).then((res) => {
+      relationshipServices.updateRelationship({
+        relationshipId: res,
+        status: "pending"
+      })
     })
     const response = await profileServices.updateProfile({
       userId: userProfile.$id,
-      friends: Array.from(new Set([...userProfile.friends, profile.$id]))
+      friends: userProfile.friends.filter(friendId => friendId !== profile.$id)
     })
     dispatch(updateProfile(response))
   }
@@ -69,6 +73,22 @@ function ContactProfilePanel() {
     })
     dispatch(updateProfile(response))
   }
+  async function handleUnblock(){
+    await relationshipServices.getRelationshipId({
+        fromUserId: userProfile.$id,
+        toUserId: profile.$id
+      }).then(async (res) => {
+        await relationshipServices.updateRelationship({
+          relationshipId: res,
+          type: "friend"
+        })
+      })
+      const response = await profileServices.updateProfile({
+        userId: userProfile.$id,
+        block: userProfile.block.filter(blockId => blockId!==profile.$id)
+      })
+      dispatch(updateProfile(response))
+  }
 
   const isFriend = userProfile?.friends?.includes(profile?.$id);
   const isBlocked = userProfile?.block?.includes(profile?.$id);
@@ -77,31 +97,31 @@ function ContactProfilePanel() {
     {
       name: "Message",
       icon: "message",
-      function: "",
+      function: null,
       status: true
     },
     {
       name: "Add to Friend",
       icon: "person_add",
-      function: handleAddToFriend(),
+      function: handleAddToFriend,
       status: !isFriend
     },
     {
       name: "Unfriend",
       icon: "person_remove",
-      function: "",
+      function: handleUnfriend,
       status: isFriend
     },
     {
       name: "Block",
       icon: "person_off",
-      function: handleBlock(),
+      function: handleBlock,
       status: !isBlocked
     },
     {
       name: "Unblock",
       icon: "person",
-      function: "",
+      function: handleUnblock,
       status: isBlocked
     }
   ]
@@ -148,7 +168,7 @@ function ContactProfilePanel() {
             <div className={styles.btn_container}>
               {btns.map((btn) => (
                 btn.status && 
-                  <div className={styles.msg_btn_container} onClick={btn.function}>
+                  <div className={styles.msg_btn_container} key={btn.name} onClick={btn?.function}>
                     <span className="material-symbols-outlined">{btn.icon}</span>
                     <p className={styles.msg_btn}>{btn.name}</p>
                   </div>
